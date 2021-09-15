@@ -13,6 +13,8 @@ output:
     toc_float: yes
     includes:
       after_body: tech_note_footer.html
+      in_header: gtag_technotes.js
+
 ---
 
 ```{css echo = FALSE}
@@ -20,6 +22,7 @@ h2,h1.title {font-weight:bold;}
 h4.date {font-size:90%;}
 #anr_header {background-color:#1c2c53; color:white; padding:20px;}
 ```
+
 <p style="font-style:italic; font-size:90%; margin:2em;">IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques or using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
 
 ## Introduction
