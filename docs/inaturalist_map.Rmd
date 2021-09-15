@@ -8,19 +8,18 @@ output:
     mathjax: null
     self_contained: no
     lib_dir: lib
-    toc: true
-    toc_depth: 2
-    toc_float: yes
     includes:
-      after_body: tech_note_footer.html
       in_header: gtag_technotes.js
-
+      before_body: tech_note_header.html
+      after_body: tech_note_footer.html
 ---
 
 ```{css echo = FALSE}
-h2,h1.title {font-weight:bold;}
+h1.title {font-weight:bold;}
+h1 {font-size:30px; font-weight:bold;}
+h2 {font-size:24px; font-weight:bold;}
+h3 {font-size:18px; font-weight:bold;}
 h4.date {font-size:90%;}
-#anr_header {background-color:#1c2c53; color:white; padding:20px;}
 ```
 
 <p style="font-style:italic; font-size:90%; margin:2em;">IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques or using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
@@ -253,8 +252,3 @@ Also, although leaflet works well for small to medium sized datasets, you wouldn
 
 \
 
-```{js echo=FALSE}
-$(document).ready(function() {
-  $('.main-container').prepend('<div id=\"anr_header\"><img src=\"images/ucanr_2019_white_232x30.png\" style=\"width:232px; height:30px; margin-bottom:10px;\"/><a href=\"http://igis.ucanr.edu/\"><img src=\"images/igis-shield_bg-white_40x40.png\" style=\"width:40px; height:40px; float:right;\"/></a></div><div style="clear:both;"></div>');
-});
-```
