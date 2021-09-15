@@ -1,0 +1,257 @@
+---
+title: "Mapping iNaturalist Data in R"
+author: "<a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy Lyons</a>"
+date: "September 2021"
+output:
+  html_document: 
+    code_folding: show
+    mathjax: null
+    self_contained: no
+    lib_dir: lib
+    toc: true
+    toc_depth: 2
+    toc_float: yes
+    includes:
+      after_body: tech_note_footer.html
+---
+
+```{css echo = FALSE}
+h2,h1.title {font-weight:bold;}
+h4.date {font-size:90%;}
+#anr_header {background-color:#1c2c53; color:white; padding:20px;}
+```
+<p style="font-style:italic; font-size:90%; margin:2em;">IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques or using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
+
+## Introduction
+
+<img src="images/inaturalist_logo.svg" style="float:right; padding:5px;" width="180px"/>
+
+[iNaturalist](https://www.inaturalist.org/){target="_blank" rel="noopener"} is an enormously popular platform for recording and sharing observations of nature. Most people interact with iNaturalist through the [Android](https://play.google.com/store/apps/details?id=org.inaturalist.android){target="_blank" rel="noopener"} or [iOS](https://itunes.apple.com/us/app/inaturalist/id421397028?mt=8){target="_blank" rel="noopener"} phone app, but a little known fact is the platform also has an API (Application Programming Interface). That means that you can query observations using programming languages like R and Python. And if you can query observations, then you can map them!
+
+The rest of this Tech Note demonstrates how you can download iNaturalist observations in R using the [`rinat`](https://docs.ropensci.org/rinat/){target="_blank" rel="noopener"} package, and then map them using [`leaflet`](https://rstudio.github.io/leaflet/){target="_blank" rel="noopener"}. We'll also use functions from `sf` and `dplyr`. These are very common R packages in data science, and there are lot of online resources that teach you how to use them.
+
+Our study area will be [Placerita Canyon State Park](https://parks.lacounty.gov/placerita-canyon-state-park/){target="_blank" rel="noopener"} in Los Angeles County. If you want to jump ahead to see the final product, click [here](#leaflet-map). 
+
+## Import the Park Boundary
+
+First we load the packages we're going use:
+
+```{r setup, message = FALSE, warning = FALSE}
+library(rinat)
+library(sf)
+library(dplyr)
+library(tmap)
+library(leaflet)
+
+## Load the conflicted package and set preferences
+library(conflicted)
+conflict_prefer("filter", "dplyr", quiet = TRUE)
+conflict_prefer("count", "dplyr", quiet = TRUE)
+conflict_prefer("select", "dplyr", quiet = TRUE)
+conflict_prefer("arrange", "dplyr", quiet = TRUE)
+```
+
+\
+
+Now we can import the park boundary which is saved as a [geojson file](placertia_canyon_sp.geojson). We use the [`sf`](https://r-spatial.github.io/sf/){target="_blank" rel="noopener"} package to import and transform the boundary to geographic coordinates, and [`tmap`](https://r-tmap.github.io/tmap/){target="_blank" rel="noopener"} to plot it:
+
+```{r read_placertia_sf, message = FALSE, warning = FALSE}
+placertia_sf <- st_read("placertia_canyon_sp.geojson", quiet = TRUE) %>% 
+  st_transform(4326)
+
+# tmap_mode("view")
+# tm_shape(placertia_sf) + tm_borders()
+
+leaflet(placertia_sf) %>% 
+  addTiles() %>% 
+  addPolygons()
+```
+
+\
+
+## Get the Bounding Box
+
+Next, we get the bounding box of the study area, so we can pass it to the iNaturalist API to tell it which area we're interested in:
+
+```{r placertia_bb}
+placertia_bb <- placertia_sf %>% 
+  st_bbox()
+
+placertia_bb
+```
+
+\
+
+## Download data
+
+Now we are ready to retrieve iNaturalist observations. The [`rinat`](https://docs.ropensci.org/rinat/) makes this easy with the `get_inat_obs()`.
+
+<div style="margin:0 2em; border:4px solid gray; background-color:#eee; padding:10px;">
+
+<p style="font-size:110%; font-weight:bold;">Downloading Ettiquete</p>
+
+The non-profit that supports iNaturalist doesn't charge for downloading data, because they believe in open data and supporting citizen science initiatives. They also don't require registration for simply downloading observations. That being said, downloading data consumes resources that can affect other users, and it's bad form (and bad programming) to download data unnecessarily.
+
+There are a few best practices for downloading data in ways that won't cause problems for other users:
+
+1. Use the server-side filters the API provides to only return results for your area of interest and your taxon(s) of interest. See below for examples of sending spatial areas and a taxon name when calling the API from R.
+
+2. Always save your results to disk, and don't download data more than once. Your code should check to see if you've already downloaded something before getting it again.
+
+3. Don't download more than you need. The API will throttle you (reduce your download speed) if you exceed more than [100 calls per minute](https://api.inaturalist.org/v1/){target="_blank" rel="noopener"}. Spread it out.
+
+4. The API is not designed for bulk downloads. For that, look at the [Export](https://www.inaturalist.org/observations/export){target="_blank" rel="noopener"} tool.
+</div>
+
+\
+
+We'll use the `bounds` argument in `get_inat_obs()` to specify the extent of our search. `bounds` takes 4 coordinates. Our study area is not a pure rectangle, but we'll start with the bounding box and then apply an additional mask to remove observations outside the park boundary.
+
+For starters we'll just download the most recent 100 iNaturalist observations within the bounding box. (There are actually over 3000, but that would make for a very crowded map!). The code below first checks if the data have already been downloaded, to prevent downloading data twice.
+
+```{r inat_obs_df}
+search_results_fn <- "placertia_bb_inat.Rdata"
+
+if (file.exists(search_results_fn)) {
+  load(search_results_fn)
+
+} else {  
+  # Note we have to rearrange the coordinates of the bounding box a little bit 
+  # to give get_inat_obs() what it expects
+  inat_obs_df <- get_inat_obs(bounds = placertia_bb[c(2,1,4,3)], 
+                            taxon_name = NULL,
+                            year = NULL,
+                            month = NULL,
+                            maxresults = 100)
+  
+  ## Save the data frame to disk
+  save(inat_obs_df, file = search_results_fn)
+}
+```
+
+\
+
+See what we got back:
+
+```{r head_inat_obs_df)}
+dim(inat_obs_df)
+glimpse(inat_obs_df)
+```
+
+\
+
+Next, in order to spatially filter the observations using the park boundary, we convert the data frame into a sf object. At the same time we'll select just a few of the rows:
+
+```{r inat_obs_sf}
+inat_obs_sf <-  inat_obs_df %>% 
+  select(longitude, latitude, datetime, common_name, scientific_name, image_url, user_login) %>% 
+  st_as_sf(coords=c("longitude", "latitude"), crs=4326)
+
+dim(inat_obs_sf)
+```
+
+\
+
+Next, filter out observations that lie outside Placerita Canyon SP. How many are left?
+
+```{r inat_obs_kat_sf, message=FALSE, warning=FALSE}
+inat_obs_pcsp_sf  <- inat_obs_sf %>% st_intersection(placertia_sf)
+nrow(inat_obs_pcsp_sf)
+```
+
+\
+
+Next, add a column to the attribute table containing HTML code that will appear in the popup windows:
+
+```{r popup_html_mutate}
+inat_obs_pcsp_popup_sf <- inat_obs_pcsp_sf %>% 
+  mutate(popup_html = paste0("<p><b>", common_name, "</b><br/>",
+                             "<i>", scientific_name, "</i></p>",
+                             "<p>Observed: ", datetime, "<br/>",
+                             "User: ", user_login, "</p>",
+                             "<p><img src='", image_url, "' style='width:100%;'/></p>")
+  )
+```
+
+\
+
+## Map the Results{id='leaflet-map'}
+
+Finally, we have everything we need to map the results with leaflet. Zoom-in and click on an observation to see details about it.
+
+```{r inat_obs_popup_leaflet, results='hold', out.width=680, out.height=680}
+htmltools::p("iNaturalist Observations in Placerita Canyon SP",
+             htmltools::br(),
+             inat_obs_pcsp_popup_sf$datetime %>% 
+               as.Date() %>% 
+               range(na.rm = TRUE) %>% 
+               paste(collapse = " to "),
+             style = "font-weight:bold; font-size:110%;")
+
+leaflet(placertia_sf) %>% 
+  addProviderTiles("Esri.WorldStreetMap") %>% 
+  addPolygons() %>% 
+  addCircleMarkers(data = inat_obs_pcsp_popup_sf,
+                   popup = ~popup_html, 
+                   radius = 5)
+```
+
+\
+
+## Map Arachnids
+
+The iNaturalist API supports taxon searching. If you pass it the name of a genus, for example, it will restrict results to only observations from that genus. Likewise for family, order, class, etc. Observations that don't have a scientific name assigned  will be left out.
+
+You can do a taxon search from R by passing the `taxon_name` argument in `get_inat_obs()`. Below we'll ask for the [Arachnid]() class, which includes spiders, scorpions, ticks, and other arthropods. This code should all look familiar:  
+
+```{r inat_arachnid_pcsp_popup_sf, warning=FALSE, results = 'hold', out.width=680, out.height=680}
+search_arachnid_fn <- "placertia_arachnid_obs.Rdata"
+if (file.exists(search_arachnid_fn)) {
+  load(search_arachnid_fn)
+} else {  
+  inat_arachnid_df <- get_inat_obs(bounds = placertia_bb[c(2,1,4,3)], 
+                            taxon_name = "Arachnida",
+                            year = NULL,
+                            month = NULL,
+                            maxresults = 100)
+  save(inat_arachnid_df, file = search_arachnid_fn)
+}
+
+inat_arachnid_pcsp_popup_sf <- inat_arachnid_df %>% 
+  select(longitude, latitude, datetime, common_name, scientific_name, image_url, user_login) %>%
+  st_as_sf(coords=c("longitude", "latitude"), crs=4326) %>% 
+  st_intersection(placertia_sf) %>% 
+  mutate(popup_html = paste0("<p><b>", common_name, "</b><br/>",
+                             "<i>", scientific_name, "</i></p>",
+                             "<p>Observed: ", datetime, "<br/>",
+                             "User: ", user_login, "</p>",
+                             "<p><img src='", image_url, "' style='width:100%;'/></p>"))
+
+htmltools::p("Arachnids in Placerita Canyon SP", style = "font-weight:bold; font-size:110%;")
+
+leaflet(placertia_sf) %>% 
+  addProviderTiles("Esri.WorldStreetMap") %>% 
+  addPolygons() %>% 
+  addCircleMarkers(data = inat_arachnid_pcsp_popup_sf,
+                   popup = ~popup_html, 
+                   radius = 5)
+
+```
+
+\
+
+## Summary
+
+The iNaturalist API allows you to download observations from a global community of naturalists, which is pretty powerful. This Tech Note showed you how to create a map of iNaturalist observations within a specific area and for a specific taxon using the `rinat` and `leaflet` packages for R.
+
+A couple caveats are worth noting. A limitation of this method is that the data are static. In other words, to get the latest data your have to re-query the API again. It isn't 'live' like a feature service. 
+
+Also, although leaflet works well for small to medium sized datasets, you wouldn't want to use this mapping tool for massive amounts of spatial data. With leaflet, all of the geographic information and popup content are saved in the HTML file, and rendering is done on the client. This generally makes it extremely fast because everything is in memory. But if the data overwhelm memory it can slow your browser to a crawl. If you have to map hundreds of thousands of points, for example, you would need a different approach for both downloading and visualizing the data.
+
+\
+
+```{js echo=FALSE}
+$(document).ready(function() {
+  $('.main-container').prepend('<div id=\"anr_header\"><img src=\"images/ucanr_2019_white_232x30.png\" style=\"width:232px; height:30px; margin-bottom:10px;\"/><a href=\"http://igis.ucanr.edu/\"><img src=\"images/igis-shield_bg-white_40x40.png\" style=\"width:40px; height:40px; float:right;\"/></a></div><div style="clear:both;"></div>');
+});
+```
