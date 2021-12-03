@@ -55,14 +55,11 @@ conflict_prefer("arrange", "dplyr", quiet = TRUE)
 
 \
 
-Now we can import the park boundary which is saved as a [geojson file](placertia_canyon_sp.geojson). We use the [`sf`](https://r-spatial.github.io/sf/){target="_blank" rel="noopener"} package to import and transform the boundary to geographic coordinates, and [`tmap`](https://r-tmap.github.io/tmap/){target="_blank" rel="noopener"} to plot it:
+Now we can import the park boundary which is saved as a [geojson file](placertia_canyon_sp.geojson). We use the [`sf`](https://r-spatial.github.io/sf/){target="_blank" rel="noopener"} package to import and transform the boundary to geographic coordinates, and [`leaflet`](https://rstudio.github.io/leaflet/){target="_blank" rel="noopener"} to plot it:
 
 ```{r read_placertia_sf, message = FALSE, warning = FALSE}
 placertia_sf <- st_read("placertia_canyon_sp.geojson", quiet = TRUE) %>% 
   st_transform(4326)
-
-# tmap_mode("view")
-# tm_shape(placertia_sf) + tm_borders()
 
 leaflet(placertia_sf) %>% 
   addTiles() %>% 
@@ -142,7 +139,7 @@ glimpse(inat_obs_df)
 
 \
 
-Next, in order to spatially filter the observations using the park boundary, we convert the data frame into a sf object. At the same time we'll select just a few of the rows:
+Next, in order to spatially filter the observations using the park boundary, we convert the data frame into a sf object. At the same time we'll select just a few of the columns for our map:
 
 ```{r inat_obs_sf}
 inat_obs_sf <-  inat_obs_df %>% 
