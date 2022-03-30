@@ -201,8 +201,8 @@ library(magrittr)</code></pre>
 <pre class="r"><code>flow_gv &lt;- grViz(&quot;digraph{a-&gt;b; c-&gt;a; c-&gt;b; c-&gt;d;}&quot;, width = 400, height = 400)
 
 flow_gv</code></pre>
-<div id="htmlwidget-ece8e3555bbcdb9e2009" style="width:400px;height:400px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ece8e3555bbcdb9e2009">{"x":{"diagram":"digraph{a->b; c->a; c->b; c->d;}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-47a20aff1402e1e98687" style="width:400px;height:400px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-47a20aff1402e1e98687">{"x":{"diagram":"digraph{a->b; c->a; c->b; c->d;}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p><strong>Results</strong>. This works well. As shown above, you can use the <code>width</code> and <code>height</code> arguments of <code>grViz()</code> to adjust the size of the html widget. The only disadvantage (if you want to tweak the size of the diagram) is that you have to manually compute and enter both the width and height attributes. Their default values are not exposed but appear to be 672 x 480. They don’t scale together, and they’re independent of the aspect ratio of the diagram itself.</p>
 <p>Another minor disadvantage of this option is the JavaScript libraries that get attached to the HTML file to generate the html widget add over 2700 KB to the HTML file (if standalone). That’s not unmanageable, but seems like a lot of overhead just to embed a flow chart, and might be an issue for something like a package Vignette where you want to minimize file sizes.</p>
 <p><br />
@@ -279,7 +279,7 @@ substring(flow_svg_chr, 1, 300)</code></pre>
 </g>
 </svg>
 
-<p><strong>Results</strong>. This approach works ok. The resulting HTML file will be smaller because we don’t need to load the libraries.</p>
+<p><strong>Results</strong>. This approach works ok. The resulting HTML file will be smaller because we don’t need to load the libraries. This method can be implemented more efficiently by defining a <a href="https://github.com/rich-iannone/DiagrammeRsvg/blob/main/R/knitr.R">custom knit_print function</a>, which is functionally equivalent.</p>
 <p>Unfortunately, we’ve lost the ability to control the size of the diagram. <code>export_svg()</code> seems to ignore the height and width properties of the grViz object (which in this example are 400x400). Instead it picks dimensions on our behalf. The good news though is that the dimensions hug to aspect ratio of the diagram object (in comparison, the HTML widget above is wrapped in a div that fills the width of the parent container). This allows us to easily center the diagram with simple HTML, which we couldn’t do with the HTML widget.</p>
 <pre class="r"><code>htmltools::HTML(paste0(&quot;&lt;center&gt;&quot;, flow_svg_chr, &quot;&lt;/center&gt;&quot;))</code></pre>
 <center><?xml version="1.0" encoding="UTF-8" standalone="no" ?>

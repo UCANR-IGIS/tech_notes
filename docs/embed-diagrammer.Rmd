@@ -59,7 +59,7 @@ Now we can add it to the HTML:
 htmltools::HTML(flow_svg_chr)
 ```
 
-**Results**. This approach works ok. The resulting HTML file will be smaller because we don't need to load the libraries. 
+**Results**. This approach works ok. The resulting HTML file will be smaller because we don't need to load the libraries. This method can be implemented more efficiently by defining a [custom knit_print function](https://github.com/rich-iannone/DiagrammeRsvg/blob/main/R/knitr.R), which is functionally equivalent.
 
 Unfortunately, we've lost the ability to control the size of the diagram. `export_svg()` seems to ignore the height and width properties of the grViz object (which in this example are 400x400). Instead it picks dimensions on our behalf. The good news though is that the dimensions hug to aspect ratio of the diagram object (in comparison, the HTML widget above is wrapped in a div that fills the width of the parent container). This allows us to easily center the diagram with simple HTML, which we couldn't do with the HTML widget.
 
