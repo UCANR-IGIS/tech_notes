@@ -1,0 +1,111 @@
+---
+title: "Embedding DiagrammeR Graphics in RMarkdown HTML Documents"
+author: "Andy Lyons"
+date: "March 30, 2022"
+output: 
+  html_document: 
+    self_contained: yes
+---
+
+\
+
+In this article, I test different methods to include DiagrammeR graphics in a Rmarkdown HTML document. I'm interested in this because I like to use flowcharts to illustrate workflows in Rmarkdown HTML documents (especially slide decks), hence need the ability to tweak their size and location.
+
+\
+
+First, load packages:
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(htmltools)
+library(magrittr)
+```
+
+\
+
+## Option 1. Embed a diagramme as a HTML widget
+
+The traditional way to embed a grViz object is to simply print it in a code chunk as a HTML widget:
+
+```{r}
+flow_gv <- grViz("digraph{a->b; c->a; c->b; c->d;}", width = 400, height = 400)
+
+flow_gv
+```
+
+**Results**. This works well. As shown above, you can use the `width` and `height` arguments of `grViz()` to adjust the size of the html widget. The only disadvantage (if you want to tweak the size of the diagram) is that you have to manually compute and enter both the width and height attributes. Their default values are not exposed but appear to be 672 x 480. They don't scale together, and they're independent of the aspect ratio of the diagram itself.
+
+Another minor disadvantage of this option is the JavaScript libraries that get attached to the HTML file to generate the html widget add over 2700 KB to the HTML file (if standalone). That's not unmanageable, but seems like a lot of overhead just to embed a flow chart, and might be an issue for something like a package Vignette where you want to minimize file sizes.
+
+\
+
+## Option 2. Convert the diagram to SVG-text and embed directly in the HTML
+
+HTML supports the \<svg\> tag, so another approach is to convert the diagram to a SVG tag and embed that directly into the HTML document:
+
+```{r}
+flow_svg_chr <- flow_gv  %>% DiagrammeRsvg::export_svg()
+
+substring(flow_svg_chr, 1, 300)
+```
+
+\
+
+Now we can add it to the HTML:
+
+```{r}
+htmltools::HTML(flow_svg_chr)
+```
+
+**Results**. This approach works ok. The resulting HTML file will be smaller because we don't need to load the libraries. 
+
+Unfortunately, we've lost the ability to control the size of the diagram. `export_svg()` seems to ignore the height and width properties of the grViz object (which in this example are 400x400). Instead it picks dimensions on our behalf. The good news though is that the dimensions hug to aspect ratio of the diagram object (in comparison, the HTML widget above is wrapped in a div that fills the width of the parent container). This allows us to easily center the diagram with simple HTML, which we couldn't do with the HTML widget.
+
+```{r}
+htmltools::HTML(paste0("<center>", flow_svg_chr, "</center>"))
+```
+
+
+\
+
+## Option 3. Convert the diagram to SVG-text, save to disk as a svg file, and insert with \<img\> 
+
+This option saves the diagram as an external SVG file, and brings it into the HTML document as you would any graphic:
+
+```{r}
+svg_fn <- "mygraph.svg"
+cat(flow_svg_chr, file = svg_fn)
+htmltools::img(src=svg_fn, width=250)
+```
+
+**Results**. This is a good approach because we've i) regained the ability to control the size by specifying just one of the dimensions.
+
+The only potential disadvantage of this method is we need to keep track of external files. If your goal is a standalone HTML file, you can use the `self_contained: yes` YAML option (which is the default), and Pandoc will embed the image file. But then you'll still have the svg files to deal with. But if you prefer a HTML document which is not self_contained, this is probably your best option.
+
+\
+
+## Option 4. Convert the diagram to SVG-text, manually modify the height & width attribtes, and then embed directly in the HTML
+
+Finally we can tweak the svg-text using a utility function [`gv2svg()`](gv2svg.R) that uses the xml2 package to drill down into the svg text, and manually edit the height and width attributes of the svg tag.
+
+```{r}
+source("gv2svg.R", local = knitr::knit_global())
+
+flow_svg_html <- flow_gv %>% gv2svg(width = 400) 
+
+htmltools::HTML(paste0("<center>", flow_svg_html, "</center>"))
+
+```
+
+**Results**. This works pretty well, because i) the HTML document doesn't need to load external libraries, ii) you can control the size of the graphic by specifying height and/or width, and iii) the dimensions of the SVG text 'hug' the graphic which makes it easier to center or float. The utility function also 'cleans' the SVG-text of some unnecessary tags and carriage returns, which slightly reduces the size of the HTML file.
+
+\
+
+## Session Info
+
+```{r}
+sessionInfo()
+```
+
