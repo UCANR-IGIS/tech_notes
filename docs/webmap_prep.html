@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Andy Lyons" />
+
+
+<title>Preparing Reference Layers for a Web Map</title>
+
+<script src="lib/header-attrs-2.14/header-attrs.js"></script>
+<script src="lib/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="lib/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="lib/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="lib/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="lib/navigation-1.1/tabsets.js"></script>
+<link href="lib/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="lib/highlightjs-9.12.0/highlight.js"></script>
+<script src="lib/kePrint-0.0.1/kePrint.js"></script>
+<link href="lib/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<script src="lib/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<link href="lib/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="lib/leaflet-1.3.1/leaflet.js"></script>
+<link href="lib/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="lib/proj4-2.6.2/proj4.min.js"></script>
+<script src="lib/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="lib/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="lib/leaflet-binding-2.1.1/leaflet.js"></script>
+<script src="lib/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+<script src="lib/leaflet-providers-plugin-2.1.1/leaflet-providers-plugin.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WFBV8LKRHQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WFBV8LKRHQ');
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+<div style="background-color:#1C2C53; color:white; padding:8px;">
+<img src="images/ucanr_2019_white_232x30.png" style="width:232px; height:30px; margin:15px;"/><a href="http://igis.ucanr.edu/">
+<img src="images/igis-shield_54x54.png" style="width:54px; height:54px; margin:4px; float:right;"/></a>
+</div>
+<div style="clear:both;"></div>
+
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Preparing Reference Layers for a Web
+Map</h1>
+<h4 class="author"><a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy
+Lyons</a></h4>
+<h4 class="date">August 2022</h4>
+
+</div>
+
+
+<style type="text/css">
+h1.title {font-weight:bold;}
+h1 {font-size:30px; font-weight:bold;}
+h2 {font-size:24px; font-weight:bold;}
+h3 {font-size:18px; font-weight:bold;}
+h4.date {font-size:90%;}
+</style>
+<p style="font-style:italic; font-size:90%; margin:2em;">
+IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe
+workflows and techniques or using geospatial science and technologies in
+research and extension. They are works in progress, and we welcome
+feedback and comments.
+</p>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Web maps commonly include reference layers, such as property
+boundaries, administrative areas, infrastructure features, etc. Such
+reference layers are often maintained by an organization such as a
+government agency, research unit, land owner, company, etc.</p>
+<p>Reference layers are typically not hard to find, because the
+organizations that maintain generally make them publicly available. That
+being said, reference layers often require some manipulations before you
+can use them in a web map, and like everything else will need updates
+from time-to-time.</p>
+<p>If you’re lucky (or your goals are flexible), you may be able to use
+a reference layer ‘as-is’. More likely, you may have to do one or more
+of the following manipulations to get a reference layer ‘ready’ for a
+web map, depending on how you want the web map to function and what you
+get from the reference layer.</p>
+<ul>
+<li>dissolve simple polygons into multipart polygons based on an
+attribute</li>
+<li>explode multipart polygons into simple polygons<br />
+</li>
+<li>generate text fields for labels and popup windows<br />
+</li>
+<li>omit features<br />
+</li>
+<li>split subsets of features into different layers<br />
+</li>
+<li>remove unneeded fields in the attribute table</li>
+<li>compute the area and/or perimeter of featuers in specific units
+(e.g, acres)</li>
+<li>standardize field names</li>
+<li>change the capitalization of values in the attribute table</li>
+<li>repair invalid geometries<br />
+</li>
+<li>get rid of z-values</li>
+<li>project to Web Mercator</li>
+<li>create a point version of a polygon layer to be visible when zoomed
+out</li>
+</ul>
+<p><br />
+</p>
+<p>The first step is to determine what needs to be done to get the
+‘authoritative’ reference data ready for your web map. This will largely
+depend on the design and functionality of your web map (see table below
+for some examples). Once you figure out what you need to do, all of the
+above can be done using desktop GIS software like ArcGIS Pro or QGIS.
+Some operations can also be done in your web mapping platforms (like
+ArcGIS.com).</p>
+<div style="float:right; padding:10px; text-align:center;">
+<p><img src="images/worried_bg-trans_80x80.png"
+style="padding:2px;" /><br/> <em>I have to do<br/>that again?</em></p>
+</div>
+<p><br />
+</p>
+<p>The <strong>pain point</strong> however comes when a new version of
+the authoritative data is released by the publisher. The changes may
+only be to a small number of features, but if you want your web map to
+be current you now have to repeat the entire process of transforming the
+data for your web map. Hopefully you wrote down that sequence of
+geoprocessing steps you carefully developed 15 months ago? Hopefully it
+won’t take too long to go through the workflow all over again?</p>
+<div style="clear:both;">
+<p><br />
+</p>
+</div>
+</div>
+<div id="scripting-to-the-rescue" class="section level2">
+<h2>Scripting to the Rescue!</h2>
+<p>This is a good example where scripting can pay off - handsomely. If
+you do your data prep using a scripting language like R or Python,
+repeating the processing becomes a whole lot easier. And not only is it
+easier, you’re also less likely to forget a step. Your web map will
+thank you!</p>
+<p>Scripting is not a panacea for everything, because it almost always
+takes more time to write code than use a “point and click” tool. But
+transforming reference layers that you don’t control for a web map that
+you want to stay current is a use case where scripting makes a whole lot
+of sense.</p>
+<p>The table below shows some of the common operations needed in web
+mapping, and the corresponding R functions you can use from the
+<code>sf</code> and <code>dplyr</code> packages. Further below, we’ll
+see an actual example.</p>
+<p><br />
+</p>
+<table class="table table-striped table-condensed" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Operation
+</th>
+<th style="text-align:left;">
+Use Case
+</th>
+<th style="text-align:left;">
+R function(s)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Dissolve simple polygons into multipart polygons
+</td>
+<td style="text-align:left;">
+Sometimes multiple simple polygons belong to the same entity (e.g., a
+park may consist of several pieces of land). In your web map, you may
+want labels and popups to be associated at the entity level, hence you
+need to dissolve boundaries based on attribute values.
+</td>
+<td style="text-align:left;">
+<code>dplyr::group_by()</code> followed by
+<code>dplyr::summarise()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Explode multipart polygons into simple polygons
+</td>
+<td style="text-align:left;">
+In some web maps, you might not want multipart polygons. For example,
+the individual parts of a parent feature may need to be treated
+independently for intersections or management. Think for example of a
+county which includes distant islands that are technically part of the
+county but should be treated as separate areas on your web map.
+</td>
+<td style="text-align:left;">
+<code>st_cast()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Delete unneeded fields in the attribute table
+</td>
+<td style="text-align:left;">
+Most reference datasets have extra fields in the attribute table that
+you really don’t need in your web map (sometimes there are <em>lots</em>
+of extra fields!). Getting rid of them reduces overhead, improves
+performance, and simplifies building the web map.
+</td>
+<td style="text-align:left;">
+<code>dplyr::select()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Generate text fields for labels and popup windows
+</td>
+<td style="text-align:left;">
+Most web platforms give you some ability to customize text for labels
+and popup windows. This includes basic character formatting,
+concatenating fields, adding prefixes and punctuation, wrapping text in
+HTML tags, etc. More complex text manipulation, such as search and
+replace functions, word swaps, or grabbing text from lookup tables is a
+lot easier to do in a script.
+</td>
+<td style="text-align:left;">
+<code>dplyr::mutate()</code> with <code>paste()</code> and various
+functions from the <code>stringr</code> package
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Filter features
+</td>
+<td style="text-align:left;">
+There are many cases where you only need some of the features in a
+reference layer for your web map. If your preferred features can be
+idenified via attribute fields, and/or their spatial relationship to
+your area of interest, it is easy to filter them with your script.
+</td>
+<td style="text-align:left;">
+<code>dplyr::filter()</code>, <code>st_intersects()</code>,
+<code>st_disjoint()</code>, <code>st_contains()</code>, etc.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Split subsets of features into different layers
+</td>
+<td style="text-align:left;">
+Reference datasets may contain many types or categories of features,
+that you might want separated in your web map. For example a ‘Places’
+layer may contain features for libraries, court houses, schools, fire
+stations, etc. Splitting these up into separate datasets can make your
+web map easier to navigate and reduce overhead.
+</td>
+<td style="text-align:left;">
+<code>dplyr::filter()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Compute area and/or perimeter in specific units
+</td>
+<td style="text-align:left;">
+It is not uncommon to get a polygon dataset with a field called
+‘Shape_Area’ containing the area in map units. ArcGIS Online will even
+create this field for you when you upload spatial data. However map
+units squared are often ginormous numbers not useful on web maps.
+Computing area in acres, hectares, miles squared, etc. is easy to build
+into your data processing pieline, and you can even specify the number
+of decimal places to keep.
+</td>
+<td style="text-align:left;">
+<code>sf::st_area()</code>, <code>units::set_units()</code>,
+<code>round()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Standardize field names
+</td>
+<td style="text-align:left;">
+You may find it easier to build your web map if the field names follow a
+standard naming conventions, particularly if you create custom
+expressions using Arcade or Javascript. This may involve converting
+everything to lower case, replacing spaces with underscores, etc.
+</td>
+<td style="text-align:left;">
+<code>stringr::str_to_upper()</code>,
+<code>stringr::str_to_lower()</code>,
+<code>stringr::str_replace()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Change capitalization
+</td>
+<td style="text-align:left;">
+Sometimes you get GIS layers that use ALL CAPS for things like place
+names, labels, and even comments. You may not want to keep ALL CAPS in
+your web map, which offer other formatting options to indicate
+officialness or emphasis.
+</td>
+<td style="text-align:left;">
+<code>stringr::str_to_upper()</code>,
+<code>stringr::str_to_lower()</code>,
+<code>stringr::str_to_title()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Repair invalid geometries
+</td>
+<td style="text-align:left;">
+It is not uncommon to get invalid geometries in vector data, which could
+include weird overlapping segments of a polygon, slivers smaller than
+the tolerance level, topology errors, etc. Contact the data producer to
+let them know, but in the meantime many (but not all) geometries errors
+can fixed in R.
+</td>
+<td style="text-align:left;">
+<code>sf::st_make_valid()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Get rid of z-values
+</td>
+<td style="text-align:left;">
+It’s not uncommon to get a vector layer with z-values that are all 0.
+Unless the features are on the surface of the ocean, this usually an
+error in the production. Even if the z-values are valid, they’re usually
+not useful for web mapping unless you’re doing 3D rendering. Fortunately
+they’re easily removed.
+</td>
+<td style="text-align:left;">
+<code>sf::st_zm()</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Project to Web Mercator
+</td>
+<td style="text-align:left;">
+Web Mercator is the coordinate reference system for almost all web map
+platforms (including ERSI). Although your web mapping engine may
+reproject data to web mercator on the fly, it’s easy enough to build
+into a pipeline. Plus you’ll be able to control and check the results
+locally.
+</td>
+<td style="text-align:left;">
+<code>st_transform(3857)</code>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 16em; ">
+Create a point version of a polygon layer
+</td>
+<td style="text-align:left;">
+Small polgyons are often not visible on a web map when you’re zoomed
+out. A common workaround is to add an additional point version of the
+layer (because point layers draw at every scale). The point layer is
+configured to dislay at small scales (zoomed out), and as the user zooms
+in the polygon layer appears.
+</td>
+<td style="text-align:left;">
+<code>sf::st_centroid()</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br />
+</p>
+</div>
+<div id="uploading-the-cleaned-up-reference-layer-to-your-web-map"
+class="section level2">
+<h2>Uploading the Cleaned Up Reference Layer to Your Web Map</h2>
+<p>After you’ve got the reference layer ready to go, the next step is to
+upload it to your web mapping platform. This generally involves saving
+the layer to disk, and then uploading it via the browser.</p>
+<p>The best file format for saving the data will vary depending on the
+web mapping platform. ArcGIS.com supports a number of <a
+href="https://doc.arcgis.com/en/arcgis-online/reference/supported-items.htm">spatial
+file formats</a> you can use to upload your data. I would recommend
+GeoJSON in most cases. GeoJSON is easily exported from R, and ArcGIS.com
+can create a hosted feature layer without any additional steps or
+settings. A couple of caveats about GeoJSON files include:</p>
+<ul>
+<li><p>A single GeoJSON file can only contain one layer (more
+specifically, the gdal driver that sf and other packages use to write
+GeoJSON files to disk only supports a single layer per .geojson
+file).</p></li>
+<li><p>GeoJSON is a plain text format, This makes it easy to read with
+any text editor, however it can also result in large files. If your
+dataset is particularly big, consider thinning it down further or use
+one of the alternate formats below.</p></li>
+<li><p>GeoJSON can handle projections. Projecting your layer to Web
+Mercator (epsg 3857) before you upload it is strongly recommended so
+this operation doesn’t have to be done on the server.</p></li>
+</ul>
+<p>Other file formats that ArcGIS.com can use as the data source for a
+hosted feature layer include Shapefiles (zipped) and file geodatabases
+(zipped).</p>
+<p><br />
+</p>
+</div>
+<div id="example-preparing-rec-boundaries-for-a-web-map"
+class="section level1">
+<h1>Example: Preparing REC boundaries for a Web Map</h1>
+<p>The rest of this Tech Note will work through an example of prepping
+an authoritative reference layer for a web map using R. In this case,
+we’ll be making some tweaks to the authoritative boundary layer for <a
+href="https://recs.ucanr.edu/" target="_blank" rel="noopener">Research
+and Extension Centers</a> (RECs) under the University of California
+Division of Agriculture and Natural Resources (<a
+href="https://ucanr.edu/" target="_blank" rel="noopener">UCANR</a>).</p>
+<p><br />
+</p>
+<div id="import-the-authoritative-layer" class="section level3">
+<h3>Import the Authoritative Layer</h3>
+<p>Step 1 is to import the authoritative reference layer into R. In some
+cases, this may require downloading a dataset to your hard drive as a
+Shapefile or file geodatabase. But many organizations are publishing
+authoritative layers online. In this example, we’ll grab the layer
+directly from the publisher via an <a
+href="https://ucanr-recs-ucanr.opendata.arcgis.com/">ArcGIS Open Data
+Hub</a>.</p>
+<p>First, we load the libraries we’ll need:</p>
+<pre class="r"><code>library(sf)
+library(dplyr)
+library(tmap)
+library(units)</code></pre>
+<p><br />
+</p>
+<p>First we find the URL to the Feature Service. This make take a little
+exploring, but keep clicking on links that say “Full Details” and “Data
+Source” until you see a URL that looks like:</p>
+<div style="margin-left:2em;">
+<a
+href="https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0"
+class="uri">https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0</a>
+</div>
+<p><br />
+</p>
+<p>Now we can import it using the <a
+href="https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview">R-ArcGIS</a>
+bridge. Assuming we have an active license to ArcGIS and have installed
+the package (via ArcGIS Pro), we can load it with:</p>
+<pre class="r"><code>library(arcgisbinding)</code></pre>
+<pre><code>## *** Please call arc.check_product() to define a desktop license.</code></pre>
+<pre class="r"><code>## verify the license
+arc.check_product()</code></pre>
+<pre><code>## product: ArcGIS Pro (12.9.3.32739)
+## license: Advanced
+## version: 1.0.1.300</code></pre>
+<p><br />
+</p>
+<p>Now we’re ready to import the data:</p>
+<pre class="r"><code>recs_bnd_url &lt;- &quot;https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0&quot;
+
+## Create a connection object
+recs_bnd_con &lt;- arc.open(path = recs_bnd_url)
+
+## Display info (metadata)
+recs_bnd_con</code></pre>
+<pre><code>## dataset_type    : FeatureClass
+## path            : https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0 
+## fields          : id, acres, shape_leng, name, reports_li, brochure_l, 
+## fields          : objectid, globalid, shape
+## extent          : xmin=-13703909, ymin=3869281, xmax=-12850582, ymax=5156216
+## geometry type   : Polygon
+## WKT             : PROJCS[&quot;WGS_1984_Web_Mercator_Auxiliary_Sphere&quot;,GEOGCS[&quot;GCS_...
+## WKID            : 3857</code></pre>
+<p><br />
+</p>
+<p>Import the features and convert them to sf:</p>
+<pre class="r"><code>recs_bnd_sf &lt;- arc.select(recs_bnd_con) %&gt;% arc.data2sf()
+recs_bnd_sf</code></pre>
+<pre><code>## Simple feature collection with 10 features and 8 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+##    id acres shape_leng            name
+## 1   1  5677 40036.8435 Sierra Foothill
+## 2   2  5289 25136.9868            HREC
+## 3   3   327  7059.1268         Kearney
+## 4   4   200  3621.1604     South Coast
+## 5   5   172  3663.0451        Lindcove
+## 6   6     4   536.0495        Lindcove
+## 7   7   144  3859.9524   Intermountain
+## 8   8   254  5277.7131          Desert
+## 9   9    27  1363.2004          Hansen
+## 10 11   314  4797.3711        Westside
+##                                           reports_li
+## 1  https://ucanr.edu/repository/index.cfm?groupid=25
+## 2   http://ucanr.edu/repository/index.cfm?groupid=28
+## 3                                                   
+## 4                                                   
+## 5                                                   
+## 6                                                   
+## 7                                                   
+## 8                                                   
+## 9                                                   
+## 10                                                  
+##                                                                              brochure_l
+## 1  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43729.pdf
+## 2  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44828.pdf
+## 3  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43727.pdf
+## 4  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44604.pdf
+## 5  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf
+## 6  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf
+## 7  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43726.pdf
+## 8  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44692.pdf
+## 9  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44456.pdf
+## 10 http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43730.pdf
+##    objectid                               globalid
+## 1         1 {64623466-2572-46FA-AB13-473A1E1C5C95}
+## 2         2 {FC61A96F-FF5A-4518-979F-AFBE7E93CD77}
+## 3         3 {AA933CA2-0D73-43FD-9F5D-A1AB8E371498}
+## 4         4 {6FD12525-11E8-498C-A405-C738B0A42877}
+## 5         5 {ACDCFD74-8528-445D-97C6-18FB02118D45}
+## 6         6 {F9BAF129-052E-48F4-9A13-5C155A643032}
+## 7         7 {8E263E9E-C5C9-4119-802E-3D21E637656A}
+## 8         8 {EE408304-6217-4F02-B06D-93FE1A86C4A9}
+## 9         9 {6DAA7910-06D5-4271-A2F8-F6B7FC7177A4}
+## 10       10 {018CDACC-57F8-45CF-BFD1-19E3660B8E43}
+##                              geom
+## 1  POLYGON ((-13503217 4764217...
+## 2  POLYGON ((-13703821 4727149...
+## 3  MULTIPOLYGON (((-13302969 4...
+## 4  POLYGON ((-13103815 3987380...
+## 5  POLYGON ((-13253954 4350369...
+## 6  POLYGON ((-13253031 4350365...
+## 7  POLYGON ((-13521647 5155677...
+## 8  POLYGON ((-12850595 3870724...
+## 9  POLYGON ((-13258701 4072333...
+## 10 POLYGON ((-13371864 4347843...</code></pre>
+<p><br />
+</p>
+<p>Inspect the results</p>
+<pre class="r"><code>tmap_mode(&quot;view&quot;)</code></pre>
+<pre><code>## tmap mode set to interactive viewing</code></pre>
+<pre class="r"><code>tm_shape(recs_bnd_sf) + tm_polygons(col = &quot;yellow&quot;)</code></pre>
+<div id="htmlwidget-3328437071495593b422" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3328437071495593b422">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["Esri.WorldGrayCanvas",null,"Esri.WorldGrayCanvas",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldTopoMap",null,"Esri.WorldTopoMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addPolygons","args":[[[[{"lng":[-121.301465550864,-121.301231979907,-121.300949643905,-121.300852815399,-121.30098637961,-121.301212878131,-121.301578252601,-121.301529138111,-121.30093123473,-121.301005696084,-121.296757461595,-121.296708455802,-121.289766397457,-121.287107173112,-121.286898197129,-121.282482388213,-121.282470062429,-121.282410615516,-121.282343170005,-121.287423515737,-121.287295323451,-121.29637415765,-121.296224675292,-121.301094252004,-121.300918325939,-121.300923460709,-121.300928593683,-121.296189758675,-121.291378144858,-121.291421420299,-121.291433228653,-121.291483941246,-121.287208551585,-121.287225162333,-121.287190021137,-121.286800136134,-121.286588521799,-121.286430293443,-121.286222070249,-121.285781580451,-121.285444112145,-121.285055239543,-121.284742219786,-121.284662281404,-121.284478571436,-121.284270549464,-121.283984080314,-121.28377748307,-121.283155312599,-121.282610634398,-121.282404649805,-121.281913013528,-121.281346970694,-121.28103885484,-121.280627713002,-121.280318785071,-121.27993195973,-121.27954657349,-121.278983633437,-121.278521594852,-121.277722718579,-121.276998044944,-121.276454001852,-121.275831438817,-121.275416822296,-121.275103985795,-121.274926784122,-121.272229000492,-121.27226592664,-121.272294759865,-121.271668063682,-121.27106994201,-121.270833146101,-121.270571845049,-121.270756184736,-121.270404072094,-121.270174859762,-121.27040875052,-121.271004471894,-121.271507218534,-121.273290066251,-121.274526225337,-121.273720088879,-121.272913961404,-121.271174555316,-121.270762631046,-121.273071604059,-121.274555340634,-121.275905733983,-121.277320796151,-121.276721496787,-121.276098639105,-121.275737872094,-121.275085046614,-121.274443004511,-121.274370536518,-121.273956439223,-121.273448847071,-121.273284008012,-121.273301607806,-121.277479047863,-121.277864031658,-121.277913595305,-121.279372980349,-121.279833751411,-121.282059597022,-121.282997123769,-121.285481309584,-121.287726228225,-121.287679447558,-121.292495280762,-121.292478733795,-121.296182322421,-121.296124007386,-121.307734518634,-121.307753940211,-121.308340485294,-121.306979068718,-121.307877953534,-121.314945907173,-121.322258847559,-121.326234941025,-121.326895646527,-121.327892397403,-121.328413665508,-121.328722278131,-121.329047130497,-121.329064332336,-121.329081535074,-121.333798982991,-121.333719203611,-121.324285835811,-121.324519627753,-121.333677673597,-121.333662899904,-121.329712897107,-121.32916727298,-121.329176510356,-121.329186891287,-121.329240396742,-121.333718608926,-121.33371002732,-121.333709113734,-121.328966925315,-121.325471653308,-121.324148788831,-121.320120134039,-121.314807463313,-121.31011938222,-121.308556689122,-121.307313242902,-121.307476489247,-121.311717220108,-121.314841692718,-121.314865720856,-121.314929545258,-121.305371856911,-121.305381857855,-121.305425245585,-121.301059523135,-121.301056237996,-121.301011838763,-121.300997039019,-121.303182570935,-121.302254591484,-121.301465550864],"lat":[39.2963922653515,39.2967841947408,39.2974613886852,39.2979612168842,39.2983910353045,39.2987143247384,39.2989313605559,39.299252315233,39.2993208204283,39.3057208547188,39.3057331453994,39.3030248832625,39.3029630305446,39.3029468536388,39.2951202587024,39.2951673842729,39.2939461455354,39.2877994559568,39.2807026846101,39.280706983227,39.2773056044312,39.2771704478901,39.2662902310167,39.2662501146125,39.2608268999842,39.2561141951727,39.2514014845124,39.2513593178979,39.2513556435524,39.252850970119,39.2532580989008,39.2550685445763,39.2550981534143,39.255727031163,39.2557096566655,39.2558479986693,39.2561693330279,39.2564498086679,39.2566098493229,39.2566874721887,39.2567060025015,39.2567434366399,39.2569632429419,39.2571844737931,39.2573645683077,39.2575040150959,39.2575427606606,39.2575414954116,39.2575980872838,39.2576750593906,39.2576133878096,39.2575101479743,39.2570831378201,39.2568197106261,39.256616053229,39.2564329323884,39.2562692374135,39.2559648292959,39.2552364778436,39.2548306870598,39.2543830004172,39.2542776133576,39.2542941534825,39.2543912043852,39.2545293556126,39.2547292287367,39.2549615204102,39.2549214149124,39.2513363681912,39.2513147909662,39.251019347599,39.2500202051426,39.2492904973239,39.2484063835078,39.2478149638785,39.2471715645712,39.246133886068,39.2458292795064,39.2457721097561,39.2460436428709,39.2460480910998,39.2464185091701,39.2459831451213,39.2455477748915,39.2446083264585,39.2440960748619,39.2445704600716,39.2452306265597,39.2455587104875,39.2455576481646,39.2449278875057,39.2446153154828,39.2443238970693,39.2444022521983,39.2440406450557,39.2435334367104,39.2431091883148,39.2430356454131,39.2413153854589,39.2372002746589,39.2372145846763,39.2305362220675,39.2305227992781,39.2303945200071,39.2305627948686,39.2305730592262,39.2305541038074,39.2296302670928,39.2287955306783,39.2327367983473,39.2327214360324,39.2287317363795,39.2287067383119,39.2230411764853,39.2228490136054,39.2228484429527,39.2236934945862,39.2287918683721,39.2305524268291,39.2336473661044,39.23519125339,39.2332805468403,39.232673423732,39.232368203452,39.2319421751011,39.2301159581159,39.2301102737501,39.2318312774506,39.2335522806923,39.2334900347256,39.2372711720799,39.2373666497392,39.2444904883158,39.2444847139774,39.2479236803853,39.247949145357,39.2479528776216,39.2495839069293,39.2514661771319,39.255129995109,39.2551233451932,39.2642721048922,39.2660540828349,39.2660750115008,39.2660905918494,39.2660959923221,39.2661131333431,39.2661356581378,39.2661750144389,39.2661880917035,39.2661985768819,39.270444461814,39.2704399873149,39.2704363744732,39.2732399121783,39.2805000095964,39.2806111119069,39.2808514241137,39.2843428810791,39.2843971804367,39.2850863393252,39.2925170498414,39.2949939510051,39.2949980686875,39.2957531021277,39.2963922653515]}]],[[{"lng":[-123.103517813864,-123.10361231214,-123.084089485683,-123.084080237528,-123.051810744787,-123.051859721835,-123.047150919304,-123.047295051296,-123.056565256295,-123.056608287394,-123.051909134566,-123.051847686207,-123.065541884672,-123.065473578575,-123.065277107141,-123.065191365642,-123.074226283901,-123.07712621542,-123.088937048281,-123.090883288769,-123.089431517845,-123.091614343137,-123.090736777139,-123.091730300369,-123.091880793332,-123.092080804128,-123.092188634301,-123.092353634158,-123.092523405865,-123.092714013995,-123.092953627919,-123.093150658105,-123.093242772253,-123.093272204655,-123.093351078533,-123.093577897753,-123.093579218276,-123.093638061521,-123.093716541937,-123.094346855636,-123.094425634293,-123.09484403901,-123.095568171859,-123.09616436934,-123.096647527317,-123.096775919029,-123.096847962118,-123.096780155484,-123.097489440978,-123.097721032946,-123.098721176759,-123.100016833063,-123.100510323463,-123.100950439562,-123.101792345137,-123.103239261566,-123.104302079039,-123.093475142162,-123.10172592101,-123.098262837437,-123.097934221129,-123.103330412719,-123.103517813864],"lat":[39.0382276331042,39.0424177535739,39.0424871708393,39.0351655857737,39.0353054434677,39.0315657754859,39.031630766738,39.0244758148968,39.0245169130695,39.0208898790852,39.013719046939,39.0064785481191,39.0064719053972,39.0011643199853,38.9977852471311,38.981813127812,38.9815961302862,38.9858565551514,38.9809553304412,38.983888061229,38.9844893345148,38.9879504299468,38.9882169270765,38.9900454207032,38.9903471769113,38.9907119721822,38.9909461778152,38.9913019875546,38.99143702293,38.9914999529591,38.9915087782818,38.9915131295007,38.9915896521196,38.991747323406,38.9919094614371,38.9920669777087,38.9922517038285,38.9925490240703,38.9926841282822,38.9931612202764,38.9932467624104,38.9936519299415,38.9943857559861,38.9949664920513,38.9954752277352,38.9956868843452,38.9958580364095,38.996155457395,38.9968171948102,38.9975514083166,38.9984516929028,38.9992931486849,38.9994053721457,38.9998014874464,39.0005306826406,39.0016017749844,39.0050701794077,39.0088683866721,39.0209727216577,39.0209530983757,39.0288426848903,39.029928484361,39.0382276331042]}]],[[{"lng":[-119.502603863005,-119.50260981614,-119.502618755276,-119.502643643101,-119.506932212843,-119.506917617017,-119.506917312488,-119.507658155798,-119.507657535062,-119.508743644054,-119.50874461693,-119.511391818223,-119.511396115763,-119.502846355131,-119.502787389716,-119.502587322326,-119.502603863005],"lat":[36.5968691558017,36.5942020486681,36.5901971752556,36.5901971377493,36.5901905113971,36.5941065870688,36.5941880155507,36.5941938272825,36.5941199963301,36.5941244131924,36.5942841153437,36.5942671475287,36.6044577502147,36.60444530908,36.6044069991413,36.604277015348,36.5968691558017]},{"lng":[-119.515994862096,-119.515993544267,-119.511585107825,-119.511594426947,-119.520956214291,-119.520920562852,-119.518512158914,-119.518512599987,-119.515994862096],"lat":[36.6002496548703,36.6000518801373,36.6000543956226,36.5973403664663,36.5973575139074,36.6001595620181,36.6001947838039,36.6002607076876,36.6002496548703]}]],[[{"lng":[-117.713568908921,-117.719165833553,-117.724283221316,-117.727520953517,-117.721964295868,-117.71876765171,-117.713568908921],"lat":[33.6909587991125,33.6854809348071,33.68908233222,33.6913608304056,33.6968215695631,33.6945892958846,33.6909587991125]}]],[[{"lng":[-119.062296554278,-119.059717992358,-119.059628168016,-119.059121034902,-119.058356999786,-119.05778246967,-119.057540823757,-119.057134362142,-119.05690252673,-119.056262768144,-119.054495128007,-119.053125507117,-119.052963305513,-119.053037293455,-119.052695205113,-119.05270691106,-119.052541483605,-119.052215472412,-119.052216133572,-119.053728207503,-119.054015249779,-119.054164361133,-119.054162494434,-119.054154007151,-119.054523606398,-119.054796738262,-119.054826264089,-119.054822516317,-119.054763120609,-119.054754917194,-119.054813542148,-119.054848326712,-119.054850169157,-119.054857602716,-119.055081581462,-119.055726307731,-119.05581843715,-119.056584294947,-119.057012570352,-119.057254022229,-119.057311037402,-119.057858842639,-119.059847064993,-119.05987465495,-119.059955398223,-119.059984091311,-119.062531809577,-119.06243789251,-119.062393013577,-119.062363335935,-119.062309951753,-119.062296554278],"lat":[36.3607116895299,36.3606910924904,36.3606712586474,36.3606633770499,36.3607299000225,36.3608055820695,36.3607959990183,36.3606971604864,36.360660892122,36.36064428904,36.3605994995484,36.3605693591879,36.3606521619585,36.3604195448426,36.3600994671149,36.3596369684896,36.3594979907042,36.3594112534395,36.3589754178022,36.3589837777578,36.3587719904938,36.3585973249248,36.3579817804842,36.3579014251635,36.3575297288193,36.3569087493439,36.3568210542397,36.3567407375105,36.3565605713159,36.3564572796146,36.3563162943526,36.3561865860655,36.3560374968694,36.3558196361065,36.355339718537,36.3541826563592,36.3540151761844,36.3530273010481,36.3525069629733,36.352145698967,36.3521346866735,36.3511450534381,36.351151167759,36.3510967755362,36.3510980792888,36.3511529215294,36.3511900639739,36.3530511999307,36.3551650525005,36.3571987397641,36.3588460951946,36.3607116895299]}]],[[{"lng":[-119.054001080652,-119.05399619202,-119.052900983094,-119.052810037654,-119.052792087518,-119.052807667899,-119.052819122317,-119.052839752127,-119.052840872326,-119.05286599012,-119.05301511405,-119.05398216842,-119.054001080652],"lat":[36.3606834568557,36.3622279724398,36.3622088334523,36.3621111592198,36.3619429835532,36.3616555166844,36.3613777113093,36.3610062702924,36.3609158004566,36.3608287565981,36.3606793413532,36.3606794809721,36.3606834568557]}]],[[{"lng":[-121.46701778317,-121.467027906285,-121.471912217165,-121.471777320752,-121.47471544145,-121.474264516822,-121.474299882596,-121.474450863344,-121.474451189433,-121.474487521794,-121.467054117328,-121.46701778317],"lat":[41.9645902263144,41.9608857977739,41.9608874984728,41.9558361507094,41.958445941602,41.9587440856279,41.9608803389713,41.9645485609336,41.9645801115511,41.9681049468728,41.9681944391186,41.9645902263144]}]],[[{"lng":[-115.438857645911,-115.438985799569,-115.439109234378,-115.442246331013,-115.443523787449,-115.443534992136,-115.443540055041,-115.443544210647,-115.443553420175,-115.443557573985,-115.44356711589,-115.443520746652,-115.447536636383,-115.447621752655,-115.447831685344,-115.447917218433,-115.439595233726,-115.438758853688,-115.438744587543,-115.438857645911],"lat":[32.8146239125793,32.8109589495743,32.8085115349315,32.811034949426,32.8110374605563,32.8101696947244,32.8096169377119,32.8093407394974,32.8085128177131,32.8082369626233,32.8073729657438,32.8037298791321,32.8037412745293,32.8110078147186,32.8110078056586,32.8182320889237,32.8182976553464,32.8182808232387,32.8178863224416,32.8146239125793]}]],[[{"lng":[-119.104935228478,-119.105382108891,-119.108231918908,-119.106067313247,-119.106012484573,-119.105998266039,-119.105977924588,-119.105957169013,-119.103434097824,-119.103677353518,-119.103919129687,-119.104156839183,-119.104390417326,-119.104619786863,-119.104935228478],"lat":[34.3235695328948,34.3231540906739,34.3264455624392,34.3277290520095,34.3277517534085,34.3277565472524,34.3277600354377,34.3277599412225,34.3248302492821,34.3246443976914,34.3244531032531,34.324258333402,34.3240601548835,34.3238586225729,34.3235695328948]}]],[[{"lng":[-120.121497295853,-120.112474506647,-120.103615633929,-120.103623270507,-120.112481295216,-120.12153593958,-120.121532161266,-120.121494120309,-120.121497295853],"lat":[36.3424342768959,36.3423982105854,36.342425866683,36.3353243930636,36.3352939838509,36.3352418289335,36.3410878353209,36.3417447681139,36.3424342768959]}]]],["X1","X2","X3","X4","X5","X6","X7","X8","X9","X11"],"recs_bnd_sf",{"interactive":true,"className":"","pane":"tmap401","stroke":true,"color":"#666666","weight":1,"opacity":1,"fill":true,"fillColor":["#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00","#FFFF00"],"fillOpacity":[1,1,1,1,1,1,1,1,1,1],"dashArray":"none","smoothFactor":1,"noClip":false},["<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>1<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>1<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>5,677<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>40,037<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Sierra Foothill<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr>https://ucanr.edu/repository/index.cfm?groupid=25<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43729.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>1<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{64623466-2572-46FA-AB13-473A1E1C5C95}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>2<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>2<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>5,289<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>25,137<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>HREC<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/repository/index.cfm?groupid=28<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44828.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>2<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{FC61A96F-FF5A-4518-979F-AFBE7E93CD77}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>3<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>3<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>327<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>7,059<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Kearney<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43727.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>3<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{AA933CA2-0D73-43FD-9F5D-A1AB8E371498}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>4<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>4<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>200<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>3,621<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>South Coast<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44604.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>4<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{6FD12525-11E8-498C-A405-C738B0A42877}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>5<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>5<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>172<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>3,663<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Lindcove<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>5<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{ACDCFD74-8528-445D-97C6-18FB02118D45}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>6<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>6<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>4<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>536<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Lindcove<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>6<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{F9BAF129-052E-48F4-9A13-5C155A643032}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>7<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>7<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>144<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>3,860<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Intermountain<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43726.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>7<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{8E263E9E-C5C9-4119-802E-3D21E637656A}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>8<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>8<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>254<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>5,278<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Desert<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44692.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>8<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{EE408304-6217-4F02-B06D-93FE1A86C4A9}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>9<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>9<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>27<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>1,363<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Hansen<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44456.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>9<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{6DAA7910-06D5-4271-A2F8-F6B7FC7177A4}<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>11<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>id<\/nobr><\/td><td align=\"right\"><nobr>11<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>acres<\/nobr><\/td><td align=\"right\"><nobr>314<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>shape_leng<\/nobr><\/td><td align=\"right\"><nobr>4,797<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Westside<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>reports_li<\/nobr><\/td><td align=\"right\"><nobr> <\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>brochure_l<\/nobr><\/td><td align=\"right\"><nobr>http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43730.pdf<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>objectid<\/nobr><\/td><td align=\"right\"><nobr>10<\/nobr><\/td><\/tr><tr><td style=\"color: #888888;\"><nobr>globalid<\/nobr><\/td><td align=\"right\"><nobr>{018CDACC-57F8-45CF-BFD1-19E3660B8E43}<\/nobr><\/td><\/tr><\/table><\/div>"],null,["1","2","3","4","5","6","7","8","9","11"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["Esri.WorldGrayCanvas","OpenStreetMap","Esri.WorldTopoMap"],"recs_bnd_sf",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[32.8037298791321,41.9681944391186],"lng":[-123.104302079039,-115.438744587543]},"fitBounds":[32.8037298791321,-123.104302079039,41.9681944391186,-115.438744587543,[]]},"evals":[],"jsHooks":[]}</script>
+<p><br />
+</p>
+</div>
+<div id="define-our-data-cleaning-needs" class="section level2">
+<h2>Define Our Data Cleaning Needs</h2>
+<p>Defining the tasks for data prep is typically an iterative process as
+you build your web map. In this example, our to-do list of operations
+include:</p>
+<div style="margin-left:1em;">
+<ol style="list-style-type: decimal">
+<li><p>Keep the <code>objectid</code>, <code>name</code>,
+<code>brochure</code> fields. Dump everything else.</p></li>
+<li><p>Dissolve (aka union) polygons based on the REC name. As it is
+now, there are two polygons for ‘Lindcove’, but we want them to be
+treated as a single feature in the webmap.</p></li>
+<li><p>Compute the area of each REC to the nearest acre.</p></li>
+<li><p>Standardize the values in the ‘name’ column (as it is now one of
+them is abbreviated while the others are spelled out).</p></li>
+<li><p>Add a column for abbreviated names.</p></li>
+<li><p>Create a point version of the layer.</p></li>
+</ol>
+</div>
+<p><br />
+</p>
+<p>We’ll go through these operations one-by-one to illustrate the code,
+but see <a href="#compact">below</a> for a compact form of the code.</p>
+<p><br />
+</p>
+<div id="keep-select-fields-and-dump-everything-else"
+class="section level3">
+<h3>1) Keep select fields and dump everything else</h3>
+<p>To keep only certain columns, use <code>select()</code>.</p>
+<p>Note below we won’t keep the existing <code>objectid</code> column,
+because once we dissolve boundaries (coming up) there will be one less
+polygon and we’ll need to recreate <code>objectid</code> anyway.</p>
+<p>Note also we don’t have to include the <code>geom</code> column
+(which has the geometry) in <code>select()</code>. The geometry column
+is always included when you use <code>select()</code> on a simple
+feature data frame.</p>
+<pre class="r"><code>recs_bnd_sf_2 &lt;- recs_bnd_sf %&gt;% select(name, brochure_l)
+
+recs_bnd_sf_2</code></pre>
+<pre><code>## Simple feature collection with 10 features and 2 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+##               name
+## 1  Sierra Foothill
+## 2             HREC
+## 3          Kearney
+## 4      South Coast
+## 5         Lindcove
+## 6         Lindcove
+## 7    Intermountain
+## 8           Desert
+## 9           Hansen
+## 10        Westside
+##                                                                              brochure_l
+## 1  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43729.pdf
+## 2  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44828.pdf
+## 3  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43727.pdf
+## 4  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44604.pdf
+## 5  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf
+## 6  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf
+## 7  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43726.pdf
+## 8  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44692.pdf
+## 9  http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44456.pdf
+## 10 http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43730.pdf
+##                              geom
+## 1  POLYGON ((-13503217 4764217...
+## 2  POLYGON ((-13703821 4727149...
+## 3  MULTIPOLYGON (((-13302969 4...
+## 4  POLYGON ((-13103815 3987380...
+## 5  POLYGON ((-13253954 4350369...
+## 6  POLYGON ((-13253031 4350365...
+## 7  POLYGON ((-13521647 5155677...
+## 8  POLYGON ((-12850595 3870724...
+## 9  POLYGON ((-13258701 4072333...
+## 10 POLYGON ((-13371864 4347843...</code></pre>
+<p><br />
+</p>
+</div>
+<div id="a-dissolve-or-union-polygons-based-on-the-rec-name"
+class="section level3">
+<h3>2a) Dissolve or union polygons based on the REC name</h3>
+<p>You can dissolve / union polygons based on an attribute field by
+using <code>group_by()</code> followed by <code>summarise()</code>. Note
+to keep columns from the attribute table, we have to include them in
+<code>summarise()</code> and tell it how to aggregate values. For
+discrete fields that are all the same (like names and labels), we can
+use <code>first()</code>.</p>
+<pre class="r"><code>recs_bnd_sf_3 &lt;- recs_bnd_sf_2 %&gt;% 
+  group_by(name) %&gt;% 
+  summarise(name = first(name), brochure = first(brochure_l))
+
+recs_bnd_sf_3</code></pre>
+<pre><code>## Simple feature collection with 9 features and 2 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 3
+##   name            brochure                                                  geom
+##   &lt;chr&gt;           &lt;chr&gt;                                           &lt;GEOMETRY [m]&gt;
+## 1 Desert          http://ucanr.edu/sites/rec/newslett… POLYGON ((-12850595 3870…
+## 2 Hansen          http://ucanr.edu/sites/rec/newslett… POLYGON ((-13258701 4072…
+## 3 HREC            http://ucanr.edu/sites/rec/newslett… POLYGON ((-13703821 4727…
+## 4 Intermountain   http://ucanr.edu/sites/rec/newslett… POLYGON ((-13521647 5155…
+## 5 Kearney         http://ucanr.edu/sites/rec/newslett… MULTIPOLYGON (((-1330296…
+## 6 Lindcove        http://ucanr.edu/sites/rec/newslett… MULTIPOLYGON (((-1325366…
+## 7 Sierra Foothill http://ucanr.edu/sites/rec/newslett… POLYGON ((-13503217 4764…
+## 8 South Coast     http://ucanr.edu/sites/rec/newslett… POLYGON ((-13103815 3987…
+## 9 Westside        http://ucanr.edu/sites/rec/newslett… POLYGON ((-13371864 4347…</code></pre>
+<p><br />
+</p>
+<p>After this step, you can now see that there is only one feature for
+‘Lindcove’</p>
+<p><br />
+</p>
+</div>
+<div id="b-regenerate-objectid" class="section level3">
+<h3>2b) Regenerate <code>objectid</code></h3>
+<p>We can regenerate a unique id field using <code>mutate()</code> with
+<code>row_number()</code>.</p>
+<pre class="r"><code>recs_bnd_sf_4 &lt;- recs_bnd_sf_3 %&gt;% 
+  mutate(objectid = row_number())
+
+recs_bnd_sf_4</code></pre>
+<pre><code>## Simple feature collection with 9 features and 3 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 4
+##   name            brochure                                          geom objec…¹
+## * &lt;chr&gt;           &lt;chr&gt;                                   &lt;GEOMETRY [m]&gt;   &lt;int&gt;
+## 1 Desert          http://ucanr.edu/sites/rec/… POLYGON ((-12850595 3870…       1
+## 2 Hansen          http://ucanr.edu/sites/rec/… POLYGON ((-13258701 4072…       2
+## 3 HREC            http://ucanr.edu/sites/rec/… POLYGON ((-13703821 4727…       3
+## 4 Intermountain   http://ucanr.edu/sites/rec/… POLYGON ((-13521647 5155…       4
+## 5 Kearney         http://ucanr.edu/sites/rec/… MULTIPOLYGON (((-1330296…       5
+## 6 Lindcove        http://ucanr.edu/sites/rec/… MULTIPOLYGON (((-1325366…       6
+## 7 Sierra Foothill http://ucanr.edu/sites/rec/… POLYGON ((-13503217 4764…       7
+## 8 South Coast     http://ucanr.edu/sites/rec/… POLYGON ((-13103815 3987…       8
+## 9 Westside        http://ucanr.edu/sites/rec/… POLYGON ((-13371864 4347…       9
+## # … with abbreviated variable name ¹​objectid</code></pre>
+<p><br />
+</p>
+</div>
+<div id="compute-the-area-of-each-rec-rounded-to-the-nearest-acre"
+class="section level3">
+<h3>3) Compute the area of each REC rounded to the nearest acre</h3>
+<p>Although the original layer had a field for area in acres, you have
+to recompute area after any operation that alters geometries (such as
+dissolve). <code>st_area()</code> returns the area of each polygon as a
+units object (i.e., numeric values with units attached, which it
+determines from the CRS info). This makes it easy to convert them to our
+preferred units using <code>set_units()</code>:</p>
+<pre class="r"><code>library(units)
+recs_bnd_sf_5 &lt;- recs_bnd_sf_4 %&gt;% 
+  mutate(acres = st_area(geom) %&gt;% set_units(acres) %&gt;% round(1) %&gt;% as.numeric()) 
+
+recs_bnd_sf_5</code></pre>
+<pre><code>## Simple feature collection with 9 features and 4 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 5
+##   name            brochure                                   geom objec…¹  acres
+## * &lt;chr&gt;           &lt;chr&gt;                            &lt;GEOMETRY [m]&gt;   &lt;int&gt;  &lt;dbl&gt;
+## 1 Desert          http://ucanr.edu/sit… POLYGON ((-12850595 3870…       1  360. 
+## 2 Hansen          http://ucanr.edu/sit… POLYGON ((-13258701 4072…       2   39.1
+## 3 HREC            http://ucanr.edu/sit… POLYGON ((-13703821 4727…       3 8770. 
+## 4 Intermountain   http://ucanr.edu/sit… POLYGON ((-13521647 5155…       4  261. 
+## 5 Kearney         http://ucanr.edu/sit… MULTIPOLYGON (((-1330296…       5  310. 
+## 6 Lindcove        http://ucanr.edu/sit… MULTIPOLYGON (((-1325366…       6  272. 
+## 7 Sierra Foothill http://ucanr.edu/sit… POLYGON ((-13503217 4764…       7 9482. 
+## 8 South Coast     http://ucanr.edu/sit… POLYGON ((-13103815 3987…       8  289. 
+## 9 Westside        http://ucanr.edu/sit… POLYGON ((-13371864 4347…       9  485. 
+## # … with abbreviated variable name ¹​objectid</code></pre>
+<p><br />
+</p>
+</div>
+<div id="fix-values-in-the-name-column" class="section level3">
+<h3>4) Fix values in the ‘name’ column</h3>
+<p>You probably noticed that the name of one of the RECs is abbreviated,
+while all of the others are spelled out. Ideally you would ask the data
+publisher to fix this. In the meantime we can manually edit this one row
+this using a vectorized <code>if_else()</code> expression:</p>
+<pre class="r"><code>recs_bnd_sf_6 &lt;- recs_bnd_sf_5 %&gt;% 
+  mutate(name = if_else(name == &quot;HREC&quot;, &quot;Hopland&quot;, name))
+
+recs_bnd_sf_6</code></pre>
+<pre><code>## Simple feature collection with 9 features and 4 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 5
+##   name            brochure                                   geom objec…¹  acres
+## * &lt;chr&gt;           &lt;chr&gt;                            &lt;GEOMETRY [m]&gt;   &lt;int&gt;  &lt;dbl&gt;
+## 1 Desert          http://ucanr.edu/sit… POLYGON ((-12850595 3870…       1  360. 
+## 2 Hansen          http://ucanr.edu/sit… POLYGON ((-13258701 4072…       2   39.1
+## 3 Hopland         http://ucanr.edu/sit… POLYGON ((-13703821 4727…       3 8770. 
+## 4 Intermountain   http://ucanr.edu/sit… POLYGON ((-13521647 5155…       4  261. 
+## 5 Kearney         http://ucanr.edu/sit… MULTIPOLYGON (((-1330296…       5  310. 
+## 6 Lindcove        http://ucanr.edu/sit… MULTIPOLYGON (((-1325366…       6  272. 
+## 7 Sierra Foothill http://ucanr.edu/sit… POLYGON ((-13503217 4764…       7 9482. 
+## 8 South Coast     http://ucanr.edu/sit… POLYGON ((-13103815 3987…       8  289. 
+## 9 Westside        http://ucanr.edu/sit… POLYGON ((-13371864 4347…       9  485. 
+## # … with abbreviated variable name ¹​objectid</code></pre>
+<p><br />
+</p>
+</div>
+<div id="add-a-column-for-abbreviated-name" class="section level3">
+<h3>5) Add a column for abbreviated name</h3>
+<p>To add an abbreviated name column programmatically, we could do
+something similar as above but use <code>case_when()</code> to get the
+correct abbreviation for each REC name. That would be a bit klunky.
+Instead we’ll create a tibble with the abbreviations and join it. This
+is still klunky, but this approach lends itself to recording the
+abbreviations in a CSV file, which you can use to bring in other
+attributes as well.</p>
+<p>First we’ll create the tibble with the abbreviations:</p>
+<pre class="r"><code>rec_abbrev_tbl &lt;- c(&quot;Desert&quot;, &quot;DREC&quot;,
+                    &quot;Hansen&quot;, &quot;HAREC&quot;,
+                    &quot;Hopland&quot;, &quot;HREC&quot;,
+                    &quot;Intermountain&quot;, &quot;IREC&quot;,
+                    &quot;Kearney&quot;, &quot;KARE&quot;,
+                    &quot;Lindcove&quot;, &quot;LREC&quot;,
+                    &quot;Sierra Foothill&quot;, &quot;SFREC&quot;,
+                    &quot;South Coast&quot;, &quot;SCREC&quot;,
+                    &quot;Westside&quot;, &quot;WSREC&quot;) %&gt;% 
+  matrix(ncol = 2, byrow = TRUE) %&gt;% 
+  as_tibble(.name_repair = make.names) %&gt;% 
+  setNames(c(&quot;name&quot;, &quot;abbrev&quot;))
+
+rec_abbrev_tbl</code></pre>
+<pre><code>## # A tibble: 9 × 2
+##   name            abbrev
+##   &lt;chr&gt;           &lt;chr&gt; 
+## 1 Desert          DREC  
+## 2 Hansen          HAREC 
+## 3 Hopland         HREC  
+## 4 Intermountain   IREC  
+## 5 Kearney         KARE  
+## 6 Lindcove        LREC  
+## 7 Sierra Foothill SFREC 
+## 8 South Coast     SCREC 
+## 9 Westside        WSREC</code></pre>
+<p><br />
+</p>
+<p>Once we have the lookup table, we can bring in the new column with a
+simple join:</p>
+<pre class="r"><code>recs_bnd_sf_7 &lt;- recs_bnd_sf_6 %&gt;% 
+  left_join(rec_abbrev_tbl, by = &quot;name&quot;)
+
+recs_bnd_sf_7</code></pre>
+<pre><code>## Simple feature collection with 9 features and 5 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 6
+##   name            brochure                            geom objec…¹  acres abbrev
+##   &lt;chr&gt;           &lt;chr&gt;                     &lt;GEOMETRY [m]&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; 
+## 1 Desert          http://ucanr.… POLYGON ((-12850595 3870…       1  360.  DREC  
+## 2 Hansen          http://ucanr.… POLYGON ((-13258701 4072…       2   39.1 HAREC 
+## 3 Hopland         http://ucanr.… POLYGON ((-13703821 4727…       3 8770.  HREC  
+## 4 Intermountain   http://ucanr.… POLYGON ((-13521647 5155…       4  261.  IREC  
+## 5 Kearney         http://ucanr.… MULTIPOLYGON (((-1330296…       5  310.  KARE  
+## 6 Lindcove        http://ucanr.… MULTIPOLYGON (((-1325366…       6  272.  LREC  
+## 7 Sierra Foothill http://ucanr.… POLYGON ((-13503217 4764…       7 9482.  SFREC 
+## 8 South Coast     http://ucanr.… POLYGON ((-13103815 3987…       8  289.  SCREC 
+## 9 Westside        http://ucanr.… POLYGON ((-13371864 4347…       9  485.  WSREC 
+## # … with abbreviated variable name ¹​objectid</code></pre>
+<p><br />
+</p>
+<p>Finally, in preparation for exporting this, let’s rearrange the order
+of the columns:</p>
+<pre class="r"><code>recs_bnd_sf_8 &lt;- recs_bnd_sf_7 %&gt;% 
+  relocate(objectid, name, abbrev, acres, brochure, geom)
+
+recs_bnd_sf_8</code></pre>
+<pre><code>## Simple feature collection with 9 features and 5 fields
+## Geometry type: GEOMETRY
+## Dimension:     XY
+## Bounding box:  xmin: -13703910 ymin: 3869281 xmax: -12850580 ymax: 5156216
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 6
+##   objectid name            abbrev  acres brochure                           geom
+##      &lt;int&gt; &lt;chr&gt;           &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;                    &lt;GEOMETRY [m]&gt;
+## 1        1 Desert          DREC    360.  http://ucanr… POLYGON ((-12850595 3870…
+## 2        2 Hansen          HAREC    39.1 http://ucanr… POLYGON ((-13258701 4072…
+## 3        3 Hopland         HREC   8770.  http://ucanr… POLYGON ((-13703821 4727…
+## 4        4 Intermountain   IREC    261.  http://ucanr… POLYGON ((-13521647 5155…
+## 5        5 Kearney         KARE    310.  http://ucanr… MULTIPOLYGON (((-1330296…
+## 6        6 Lindcove        LREC    272.  http://ucanr… MULTIPOLYGON (((-1325366…
+## 7        7 Sierra Foothill SFREC  9482.  http://ucanr… POLYGON ((-13503217 4764…
+## 8        8 South Coast     SCREC   289.  http://ucanr… POLYGON ((-13103815 3987…
+## 9        9 Westside        WSREC   485.  http://ucanr… POLYGON ((-13371864 4347…</code></pre>
+<p><br />
+</p>
+<p>We’re done with our polygon layer!</p>
+<p><br />
+</p>
+</div>
+<div id="create-a-point-version-of-the-layer" class="section level3">
+<h3>6) Create a point version of the layer</h3>
+<p>Finally, let’s create a point version of the layer, that we can
+display on the web map when zoomed out. We’ll keep all the attribute
+fields so we can use the same expressions for labels or popups.</p>
+<p>The easiest way to turn polygons into points is to grab the centroid
+with <code>st_center()</code>. For complex geometries we might need to
+do something more sophisticated, but centroids will work fine for these
+features:</p>
+<pre class="r"><code>recs_ctr_sf &lt;- recs_bnd_sf_8 %&gt;% st_centroid()</code></pre>
+<pre><code>## Warning in st_centroid.sf(.): st_centroid assumes attributes are constant over
+## geometries of x</code></pre>
+<pre class="r"><code>recs_ctr_sf</code></pre>
+<pre><code>## Simple feature collection with 9 features and 5 fields
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: -13701030 ymin: 3870419 xmax: -12851150 ymax: 5155538
+## Projected CRS: WGS 84 / Pseudo-Mercator
+## # A tibble: 9 × 6
+##   objectid name            abbrev  acres brochure                     geom
+## *    &lt;int&gt; &lt;chr&gt;           &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;                 &lt;POINT [m]&gt;
+## 1        1 Desert          DREC    360.  http://ucanr… (-12851154 3870419)
+## 2        2 Hansen          HAREC    39.1 http://ucanr… (-13258795 4072600)
+## 3        3 Hopland         HREC   8770.  http://ucanr… (-13701028 4723680)
+## 4        4 Intermountain   IREC    261.  http://ucanr… (-13522097 5155538)
+## 5        5 Kearney         KARE    310.  http://ucanr… (-13303071 4383221)
+## 6        6 Lindcove        LREC    272.  http://ucanr… (-13253525 4349797)
+## 7        7 Sierra Foothill SFREC  9482.  http://ucanr… (-13503305 4758555)
+## 8        8 South Coast     SCREC   289.  http://ucanr… (-13104592 3987407)
+## 9        9 Westside        WSREC   485.  http://ucanr… (-13370873 4347347)</code></pre>
+<p><br />
+</p>
+</div>
+<div id="export-layers-as-geojson" class="section level3">
+<h3>Export layers as GeoJSON</h3>
+<p>Next we’ll export our cleaned-up boundary and point objects to
+GeoJSON:</p>
+<pre class="r"><code>st_write(recs_bnd_sf_8, dsn = &quot;recs_bnd_3857.geojson&quot;, delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `recs_bnd_3857.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `recs_bnd_3857&#39; to data source 
+##   `recs_bnd_3857.geojson&#39; using driver `GeoJSON&#39;
+## Writing 9 features with 5 fields and geometry type Unknown (any).</code></pre>
+<pre class="r"><code>st_write(recs_ctr_sf, dsn = &quot;recs_ctr_3857.geojson&quot;, delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `recs_ctr_3857.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `recs_ctr_3857&#39; to data source 
+##   `recs_ctr_3857.geojson&#39; using driver `GeoJSON&#39;
+## Writing 9 features with 5 fields and geometry type Point.</code></pre>
+<p><br />
+</p>
+</div>
+<div id="upload-to-agol" class="section level3">
+<h3>Upload to AGOL</h3>
+<p>We’re done cleaning the reference layer. It’s now ready to upload to
+ArcGIS.com. After you upload it, you might want to go into the Feature
+Service properties and change the <strong>display name</strong> (which
+becomes the default layer name when you add it to web maps).</p>
+<p>If a new version of the authoritative reference layer is released, we
+simply have to run the commands above to clean it again, and then upload
+(and replace) the new version.</p>
+<p><br />
+</p>
+</div>
+</div>
+</div>
+<div id="compact" class="section level1">
+<h1>Compact Code</h1>
+<p>Above we performed the data processing steps separately to illustrate
+the process. In a production workflow, you’d probably put these commands
+in a script. The code snippet below does everything we did above, but
+much more compactly thanks to the use of pipes.</p>
+<pre class="r"><code>library(sf)
+library(dplyr)
+library(units)
+library(arcgisbinding)
+
+arc.check_product()
+
+epsg_webmerc &lt;- 3857
+
+rec_abbrev_tbl &lt;- c(&quot;Desert&quot;, &quot;DREC&quot;,
+                    &quot;Hansen&quot;, &quot;HAREC&quot;,
+                    &quot;Hopland&quot;, &quot;HREC&quot;,
+                    &quot;Intermountain&quot;, &quot;IREC&quot;,
+                    &quot;Kearney&quot;, &quot;KARE&quot;,
+                    &quot;Lindcove&quot;, &quot;LREC&quot;,
+                    &quot;Sierra Foothill&quot;, &quot;SFREC&quot;,
+                    &quot;South Coast&quot;, &quot;SCREC&quot;,
+                    &quot;Westside&quot;, &quot;WSREC&quot;) %&gt;% 
+  matrix(ncol = 2, byrow = TRUE) %&gt;% 
+  as_tibble() %&gt;% 
+  setNames(c(&quot;name&quot;, &quot;abbrev&quot;))
+
+recs_bnd_url &lt;- &quot;https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0&quot;
+
+recs_bnd_sf &lt;- recs_bnd_url %&gt;% 
+  arc.open() %&gt;%                                            ## create connection object
+  arc.select() %&gt;%                                          ## import the feature service
+  arc.data2sf() %&gt;%                                         ## convert to sf
+  st_zm() %&gt;%                                               ## drop z-values (if found)
+  st_transform(epsg_webmerc) %&gt;%                            ## convert to web mercator
+  select(name, brochure_l) %&gt;%                              ## select fields
+  group_by(name) %&gt;%                                        ## group by an attribute
+  summarise(name = first(name),                             ## summarize (dissolve boundaries
+            brochure = first(brochure_l)) %&gt;%               ## and aggregate attributes)
+  mutate(objectid = row_number()) %&gt;%                       ## generate unique values for objectid
+  mutate(acres = st_area(geom) %&gt;%                          ## compute area
+           set_units(acres) %&gt;%                             ## convert to acres
+           round(1) %&gt;%                                     ## round to 1 decimal place
+           as.numeric()) %&gt;%                                ## make it numeric
+  mutate(name = if_else(name == &quot;HREC&quot;,                     ## manually change one value
+                        &quot;Hopland&quot;, name)) %&gt;% 
+  left_join(rec_abbrev_tbl, by = &quot;name&quot;) %&gt;%                ## join to the table with abbreviations
+  relocate(objectid, name, abbrev, acres, brochure, geom)   ## change the order of columns
+
+## Export polygons
+recs_bnd_sf %&gt;% 
+  st_write(dsn = &quot;recs_bnd_3857.geojson&quot;,                   ## save to disk as geojson
+           delete_dsn = TRUE)                               ## overwrite the existing file    
+
+## Export centroids
+recs_bnd_sf %&gt;% 
+  st_centroid() %&gt;%                                         ## get the centroid of each polygon
+  st_write(dsn = &quot;recs_ctr_3857.geojson&quot;,                   ## save to disk as geojson
+           delete_dsn = TRUE)                               ## overwrite the existing file</code></pre>
+</div>
+
+
+<hr/>
+<p style="font-size:90%; font-style:italic; text-align:center;">This work was supported by the USDA - National Institute of Food and Agriculture (Hatch Project 1015742; Powers).</p>
+
+<p style="margin-top:2em;"><img src="data:image/png;base64,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" style="width:550px; height:58px;"/></p>
+<p>&nbsp;</p>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+</body>
+</html>
