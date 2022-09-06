@@ -1,5 +1,5 @@
 ---
-title: "Preparing Reference Layers for a Web Map"
+title: "Preparing Reference GIS Layers for a Web Map"
 author: "<a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy Lyons</a>"
 date: "August 2022"
 output:
@@ -27,7 +27,7 @@ h4.date {font-size:90%;}
 
 ## Background
 
-Web maps commonly include reference layers, such as property boundaries, administrative areas, infrastructure features, etc. Such reference layers are often maintained by an organization such as a government agency, research unit, land owner, company, etc. 
+Web maps commonly include reference GIS layers, such as property boundaries, administrative areas, infrastructure features, etc. Such reference layers are often maintained by an organization such as a government agency, research unit, land owner, company, etc. 
 
 Reference layers are typically not hard to find, because the organizations that maintain generally make them publicly available. That being said, reference layers often require some manipulations before you can use them in a web map, and like everything else will need updates from time-to-time. 
 
@@ -147,6 +147,7 @@ knitr::kable(tbl_mat, format = "html") %>%   #, table.attr='class="tbl_compact"'
 After you've got the reference layer ready to go, the next step is to upload it to your web mapping platform. This generally involves saving the layer to disk, and then uploading it via the browser.
 
 The best file format for saving the data will vary depending on the web mapping platform. ArcGIS.com supports a number of [spatial file formats](https://doc.arcgis.com/en/arcgis-online/reference/supported-items.htm) you can use to upload your data. I would recommend GeoJSON in most cases. GeoJSON is easily exported from R, and ArcGIS.com can create a hosted feature layer without any additional steps or settings. 
+
 A couple of caveats about GeoJSON files include:
 
 - A single GeoJSON file can only contain one layer (more specifically, the gdal driver that sf and other packages use to write GeoJSON files to disk only supports a single layer per .geojson file).
@@ -235,17 +236,19 @@ Defining the tasks for data prep is typically an iterative process as you build 
 
 :::{style="margin-left:1em;"}
 
-1. Keep the `objectid`, `name`, `brochure` fields. Dump everything else.
+1. Project it to EPSG 3857 (Web Wercator)
 
-2. Dissolve (aka union) polygons based on the REC name. As it is now, there are two polygons for 'Lindcove', but we want them to be treated as a single feature in the webmap.
+2. Keep the `objectid`, `name`, `brochure` fields. Dump everything else.
 
-3. Compute the area of each REC to the nearest acre.
+3. Dissolve (aka union) polygons based on the REC name. As it is now, there are two polygons for 'Lindcove', but we want them to be treated as a single feature in the webmap.
 
-4. Standardize the values in the 'name' column (as it is now one of them is abbreviated while the others are spelled out).
+4. Compute the area of each REC to the nearest acre.
 
-5. Add a column for abbreviated names.
+5. Standardize the values in the 'name' column (as it is now one of them is abbreviated while the others are spelled out).
 
-6. Create a point version of the layer.
+6. Add a column for abbreviated names.
+
+7. Create a point version of the layer.
 
 :::
 
@@ -255,80 +258,99 @@ We'll go through these operations one-by-one to illustrate the code, but see [be
 
 \
 
-### 1\) Keep select fields and dump everything else
+### 1\) Project data to Web Mercator
+
+ArcGIS.com likes data that is projected in [Web Mercator (Auxiliary Sphere)](https://spatialreference.org/ref/sr-org/epsg3857-wgs84-web-mercator-auxiliary-sphere/){target="_blank" rel="noopener"}, because that is the CRS of the tiled basemap services. You can upload your spatial data in other projection systems as well (and there are reasons for doing so if you'll be doing analysis on AGOL), and AGOL will reproject your data on the fly. However you'll get the best performance if your data is already in Web Mercator. 
+
+Also, as a general rule if you are working with data imported from a Feature Service it's always a good idea to reproject it anyway when you get it in R. ArcGIS.com Feature Services don't always use standard notation for CRSs, which can create problems for gdal.
+
+Projecting spatial data to Web Mercator (EPSG 3857) is easily done with `st_transform()`:
+
+```{r espg3857}
+epsg_webmerc <- 3857
+
+recs_bnd_sf_2 <- recs_bnd_sf %>% 
+  st_transform(epsg_webmerc)
+```
+
+\
+
+### 2\) Select fields to keep, and dump everything else
 
 To keep only certain columns, use `select()`. 
 
-Note below we won't keep the existing `objectid` column, because once we dissolve boundaries (coming up) there will be one less polygon and we'll need to recreate `objectid` anyway.
+Note below we won't keep the existing `objectid` column, because once we dissolve boundaries (*coming soon*) there will be one less polygon and we'll need to recreate `objectid` anyway.
 
 Note also we don't have to include the `geom` column (which has the geometry) in `select()`. The geometry column is always included when you use `select()` on a simple feature data frame. 
 
 ```{r select_flds}
-recs_bnd_sf_2 <- recs_bnd_sf %>% select(name, brochure_l)
+recs_bnd_sf_3 <- recs_bnd_sf_2 %>% select(name, brochure_l)
 
-recs_bnd_sf_2
+recs_bnd_sf_3
 ```
 \
 
-### 2a\) Dissolve or union polygons based on the REC name
+### 3a\) Dissolve or union polygons based on the REC name
 
 You can dissolve / union polygons based on an attribute field by using `group_by()` followed by `summarise()`. Note to keep columns from the attribute table, we have to include them in `summarise()` and tell it how to aggregate values. For discrete fields that are all the same (like names and labels), we can use `first()`.
 
 ```{r dissolve}
-recs_bnd_sf_3 <- recs_bnd_sf_2 %>% 
+recs_bnd_sf_4 <- recs_bnd_sf_3 %>% 
   group_by(name) %>% 
   summarise(name = first(name), brochure = first(brochure_l))
-
-recs_bnd_sf_3
-```
-
-\
-
-After this step, you can now see that there is only one feature for 'Lindcove'
-
-\
-
-### 2b\) Regenerate `objectid`
-
-We can regenerate a unique id field using `mutate()` with `row_number()`.
-
-```{r objectid}
-recs_bnd_sf_4 <- recs_bnd_sf_3 %>% 
-  mutate(objectid = row_number())
 
 recs_bnd_sf_4
 ```
 
 \
 
-### 3\) Compute the area of each REC rounded to the nearest acre
+After this step, you can now see that there is only one feature for 'Lindcove'.
 
-Although the original layer had a field for area in acres, you have to recompute area after any operation that alters geometries (such as dissolve). `st_area()` returns the area of each polygon as a units object (i.e., numeric values with units attached, which it determines from the CRS info). This makes it easy to convert them to our preferred units using `set_units()`: 
+\
 
-```{r compute_acres}
-library(units)
+### 3b\) (Re)generate `objectid`
+
+We can regenerate a unique id field using `mutate()` with `row_number()`.
+
+```{r objectid}
 recs_bnd_sf_5 <- recs_bnd_sf_4 %>% 
-  mutate(acres = st_area(geom) %>% set_units(acres) %>% round(1) %>% as.numeric()) 
+  mutate(objectid = row_number())
 
 recs_bnd_sf_5
 ```
 
 \
 
-### 4\) Fix values in the 'name' column
+### 4\) (Re)compute the area of each REC
 
-You probably noticed that the name of one of the RECs is abbreviated, while all of the others are spelled out. Ideally you would ask the data publisher to fix this. In the meantime we can manually edit this one row this using a vectorized `if_else()` expression:
+Although the original layer had a field for area in acres, you have to recompute area after any operation that alters geometries (such as dissolve). `st_area()` returns the area of each polygon as a units object (i.e., numeric values with units attached, which it determines from the CRS info). This makes it easy to convert them to our preferred units using `set_units()` and round it to one decimal place with `round()`.
 
-```{r fix_hrec}
+Computing area of data projected in Web Mercator is not ideal, as Mercator is well known to distort area to preserve angles. However at the scale of our features and our desired level of precision (0.1 acre), this won't be a problem.
+
+```{r compute_acres}
+library(units)
 recs_bnd_sf_6 <- recs_bnd_sf_5 %>% 
-  mutate(name = if_else(name == "HREC", "Hopland", name))
+  mutate(acres = st_area(geom) %>% set_units(acres) %>% round(1) %>% as.numeric()) 
 
 recs_bnd_sf_6
 ```
 
 \
 
-### 5\) Add a column for abbreviated name
+### 5\) Fix values in the 'name' column
+
+You probably noticed that the name of one of the RECs is abbreviated, while all of the others are spelled out. Ideally you would ask the data publisher to fix this. In the meantime we can manually edit this one row this using a vectorized `if_else()` expression:
+
+```{r fix_hrec}
+recs_bnd_sf_7 <- recs_bnd_sf_6 %>% 
+  mutate(name = if_else(name == "HREC", "Hopland", name))
+
+recs_bnd_sf_7
+```
+
+\
+
+### 6\) Add a column for abbreviated name
 
 To add an abbreviated name column programmatically, we could do something similar as above but use `case_when()` to get the correct abbreviation for each REC name. That would be a bit klunky. Instead we'll create a tibble with the abbreviations and join it. This is still klunky, but this approach lends itself to recording the abbreviations in a CSV file, which you can use to bring in other attributes as well.
 
@@ -357,10 +379,10 @@ rec_abbrev_tbl
 Once we have the lookup table, we can bring in the new column with a simple join:
 
 ```{r join_tbls}
-recs_bnd_sf_7 <- recs_bnd_sf_6 %>% 
+recs_bnd_sf_8 <- recs_bnd_sf_7 %>% 
   left_join(rec_abbrev_tbl, by = "name")
 
-recs_bnd_sf_7
+recs_bnd_sf_8
 
 ```
 
@@ -369,10 +391,10 @@ recs_bnd_sf_7
 Finally, in preparation for exporting this, let's rearrange the order of the columns:
 
 ```{r relocate_cols}
-recs_bnd_sf_8 <- recs_bnd_sf_7 %>% 
+recs_bnd_sf_9 <- recs_bnd_sf_8 %>%
   relocate(objectid, name, abbrev, acres, brochure, geom)
 
-recs_bnd_sf_8
+recs_bnd_sf_9
 ```
 
 \
@@ -381,14 +403,14 @@ We're done with our polygon layer!
 
 \
 
-### 6\) Create a point version of the layer
+### 7\) Create a point version of the layer
 
 Finally, let's create a point version of the layer, that we can display on the web map when zoomed out. We'll keep all the attribute fields so we can use the same expressions for labels or popups.
 
 The easiest way to turn polygons into points is to grab the centroid with `st_center()`. For complex geometries we might need to do something more sophisticated, but centroids will work fine for these features:
 
 ```{r str_cntr}
-recs_ctr_sf <- recs_bnd_sf_8 %>% st_centroid()
+recs_ctr_sf <- recs_bnd_sf_9 %>% st_centroid()
 
 recs_ctr_sf
 ```
@@ -400,7 +422,7 @@ recs_ctr_sf
 Next we'll export our cleaned-up boundary and point objects to GeoJSON:
 
 ```{r export_geojson}
-st_write(recs_bnd_sf_8, dsn = "recs_bnd_3857.geojson", delete_dsn = TRUE)
+st_write(recs_bnd_sf_9, dsn = "recs_bnd_3857.geojson", delete_dsn = TRUE)
 
 st_write(recs_ctr_sf, dsn = "recs_ctr_3857.geojson", delete_dsn = TRUE)
 ```
@@ -419,7 +441,7 @@ If a new version of the authoritative reference layer is released, we simply hav
 
 Above we performed the data processing steps separately to illustrate the process. In a production workflow, you'd probably put these commands in a script. The code snippet below does everything we did above, but much more compactly thanks to the use of pipes.
 
-```{r compact_code, eval = FALSE}
+```{r compact_code, eval = TRUE}
 library(sf)
 library(dplyr)
 library(units)
@@ -466,13 +488,13 @@ recs_bnd_sf <- recs_bnd_url %>%
 
 ## Export polygons
 recs_bnd_sf %>% 
-  st_write(dsn = "recs_bnd_3857.geojson",                   ## save to disk as geojson
+  st_write(dsn = "recs_bnd_3857_cmpact.geojson",            ## save to disk as geojson
            delete_dsn = TRUE)                               ## overwrite the existing file    
 
 ## Export centroids
 recs_bnd_sf %>% 
   st_centroid() %>%                                         ## get the centroid of each polygon
-  st_write(dsn = "recs_ctr_3857.geojson",                   ## save to disk as geojson
+  st_write(dsn = "recs_ctr_3857_compact.geojson",           ## save to disk as geojson
            delete_dsn = TRUE)                               ## overwrite the existing file
 ```
 

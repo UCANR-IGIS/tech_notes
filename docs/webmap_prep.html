@@ -12,7 +12,7 @@
 <meta name="author" content="Andy Lyons" />
 
 
-<title>Preparing Reference Layers for a Web Map</title>
+<title>Preparing Reference GIS Layers for a Web Map</title>
 
 <script src="lib/header-attrs-2.14/header-attrs.js"></script>
 <script src="lib/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -196,7 +196,7 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">Preparing Reference Layers for a Web
+<h1 class="title toc-ignore">Preparing Reference GIS Layers for a Web
 Map</h1>
 <h4 class="author"><a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy
 Lyons</a></h4>
@@ -220,7 +220,7 @@ feedback and comments.
 </p>
 <div id="background" class="section level2">
 <h2>Background</h2>
-<p>Web maps commonly include reference layers, such as property
+<p>Web maps commonly include reference GIS layers, such as property
 boundaries, administrative areas, infrastructure features, etc. Such
 reference layers are often maintained by an organization such as a
 government agency, research unit, land owner, company, etc.</p>
@@ -535,7 +535,8 @@ href="https://doc.arcgis.com/en/arcgis-online/reference/supported-items.htm">spa
 file formats</a> you can use to upload your data. I would recommend
 GeoJSON in most cases. GeoJSON is easily exported from R, and ArcGIS.com
 can create a hosted feature layer without any additional steps or
-settings. A couple of caveats about GeoJSON files include:</p>
+settings.</p>
+<p>A couple of caveats about GeoJSON files include:</p>
 <ul>
 <li><p>A single GeoJSON file can only contain one layer (more
 specifically, the gdal driver that sf and other packages use to write
@@ -705,6 +706,7 @@ you build your web map. In this example, our to-do list of operations
 include:</p>
 <div style="margin-left:1em;">
 <ol style="list-style-type: decimal">
+<li><p>Project it to EPSG 3857 (Web Wercator)</p></li>
 <li><p>Keep the <code>objectid</code>, <code>name</code>,
 <code>brochure</code> fields. Dump everything else.</p></li>
 <li><p>Dissolve (aka union) polygons based on the REC name. As it is
@@ -723,20 +725,44 @@ them is abbreviated while the others are spelled out).</p></li>
 but see <a href="#compact">below</a> for a compact form of the code.</p>
 <p><br />
 </p>
-<div id="keep-select-fields-and-dump-everything-else"
+<div id="project-data-to-web-mercator" class="section level3">
+<h3>1) Project data to Web Mercator</h3>
+<p>ArcGIS.com likes data that is projected in <a
+href="https://spatialreference.org/ref/sr-org/epsg3857-wgs84-web-mercator-auxiliary-sphere/"
+target="_blank" rel="noopener">Web Mercator (Auxiliary Sphere)</a>,
+because that is the CRS of the tiled basemap services. You can upload
+your spatial data in other projection systems as well (and there are
+reasons for doing so if you’ll be doing analysis on AGOL), and AGOL will
+reproject your data on the fly. However you’ll get the best performance
+if your data is already in Web Mercator.</p>
+<p>Also, as a general rule if you are working with data imported from a
+Feature Service it’s always a good idea to reproject it anyway when you
+get it in R. ArcGIS.com Feature Services don’t always use standard
+notation for CRSs, which can create problems for gdal.</p>
+<p>Projecting spatial data to Web Mercator (EPSG 3857) is easily done
+with <code>st_transform()</code>:</p>
+<pre class="r"><code>epsg_webmerc &lt;- 3857
+
+recs_bnd_sf_2 &lt;- recs_bnd_sf %&gt;% 
+  st_transform(epsg_webmerc)</code></pre>
+<p><br />
+</p>
+</div>
+<div id="select-fields-to-keep-and-dump-everything-else"
 class="section level3">
-<h3>1) Keep select fields and dump everything else</h3>
+<h3>2) Select fields to keep, and dump everything else</h3>
 <p>To keep only certain columns, use <code>select()</code>.</p>
 <p>Note below we won’t keep the existing <code>objectid</code> column,
-because once we dissolve boundaries (coming up) there will be one less
-polygon and we’ll need to recreate <code>objectid</code> anyway.</p>
+because once we dissolve boundaries (<em>coming soon</em>) there will be
+one less polygon and we’ll need to recreate <code>objectid</code>
+anyway.</p>
 <p>Note also we don’t have to include the <code>geom</code> column
 (which has the geometry) in <code>select()</code>. The geometry column
 is always included when you use <code>select()</code> on a simple
 feature data frame.</p>
-<pre class="r"><code>recs_bnd_sf_2 &lt;- recs_bnd_sf %&gt;% select(name, brochure_l)
+<pre class="r"><code>recs_bnd_sf_3 &lt;- recs_bnd_sf_2 %&gt;% select(name, brochure_l)
 
-recs_bnd_sf_2</code></pre>
+recs_bnd_sf_3</code></pre>
 <pre><code>## Simple feature collection with 10 features and 2 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -780,18 +806,18 @@ recs_bnd_sf_2</code></pre>
 </div>
 <div id="a-dissolve-or-union-polygons-based-on-the-rec-name"
 class="section level3">
-<h3>2a) Dissolve or union polygons based on the REC name</h3>
+<h3>3a) Dissolve or union polygons based on the REC name</h3>
 <p>You can dissolve / union polygons based on an attribute field by
 using <code>group_by()</code> followed by <code>summarise()</code>. Note
 to keep columns from the attribute table, we have to include them in
 <code>summarise()</code> and tell it how to aggregate values. For
 discrete fields that are all the same (like names and labels), we can
 use <code>first()</code>.</p>
-<pre class="r"><code>recs_bnd_sf_3 &lt;- recs_bnd_sf_2 %&gt;% 
+<pre class="r"><code>recs_bnd_sf_4 &lt;- recs_bnd_sf_3 %&gt;% 
   group_by(name) %&gt;% 
   summarise(name = first(name), brochure = first(brochure_l))
 
-recs_bnd_sf_3</code></pre>
+recs_bnd_sf_4</code></pre>
 <pre><code>## Simple feature collection with 9 features and 2 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -817,13 +843,13 @@ recs_bnd_sf_3</code></pre>
 </p>
 </div>
 <div id="b-regenerate-objectid" class="section level3">
-<h3>2b) Regenerate <code>objectid</code></h3>
+<h3>3b) Regenerate <code>objectid</code></h3>
 <p>We can regenerate a unique id field using <code>mutate()</code> with
 <code>row_number()</code>.</p>
-<pre class="r"><code>recs_bnd_sf_4 &lt;- recs_bnd_sf_3 %&gt;% 
+<pre class="r"><code>recs_bnd_sf_5 &lt;- recs_bnd_sf_4 %&gt;% 
   mutate(objectid = row_number())
 
-recs_bnd_sf_4</code></pre>
+recs_bnd_sf_5</code></pre>
 <pre><code>## Simple feature collection with 9 features and 3 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -845,20 +871,24 @@ recs_bnd_sf_4</code></pre>
 <p><br />
 </p>
 </div>
-<div id="compute-the-area-of-each-rec-rounded-to-the-nearest-acre"
+<div id="recompute-the-area-of-each-rec-rounded-to-the-nearest-acre"
 class="section level3">
-<h3>3) Compute the area of each REC rounded to the nearest acre</h3>
+<h3>4) (Re)compute the area of each REC rounded to the nearest acre</h3>
 <p>Although the original layer had a field for area in acres, you have
 to recompute area after any operation that alters geometries (such as
 dissolve). <code>st_area()</code> returns the area of each polygon as a
 units object (i.e., numeric values with units attached, which it
 determines from the CRS info). This makes it easy to convert them to our
-preferred units using <code>set_units()</code>:</p>
+preferred units using <code>set_units()</code>.</p>
+<p>Computing area of data projected in Web Mercator is not ideal, as
+Mercator is well known to distort area to preserve angles. However at
+the scale of our features and our desired level of precision (0.1 acre),
+this won’t be a problem.</p>
 <pre class="r"><code>library(units)
-recs_bnd_sf_5 &lt;- recs_bnd_sf_4 %&gt;% 
+recs_bnd_sf_6 &lt;- recs_bnd_sf_5 %&gt;% 
   mutate(acres = st_area(geom) %&gt;% set_units(acres) %&gt;% round(1) %&gt;% as.numeric()) 
 
-recs_bnd_sf_5</code></pre>
+recs_bnd_sf_6</code></pre>
 <pre><code>## Simple feature collection with 9 features and 4 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -881,15 +911,15 @@ recs_bnd_sf_5</code></pre>
 </p>
 </div>
 <div id="fix-values-in-the-name-column" class="section level3">
-<h3>4) Fix values in the ‘name’ column</h3>
+<h3>5) Fix values in the ‘name’ column</h3>
 <p>You probably noticed that the name of one of the RECs is abbreviated,
 while all of the others are spelled out. Ideally you would ask the data
 publisher to fix this. In the meantime we can manually edit this one row
 this using a vectorized <code>if_else()</code> expression:</p>
-<pre class="r"><code>recs_bnd_sf_6 &lt;- recs_bnd_sf_5 %&gt;% 
+<pre class="r"><code>recs_bnd_sf_7 &lt;- recs_bnd_sf_6 %&gt;% 
   mutate(name = if_else(name == &quot;HREC&quot;, &quot;Hopland&quot;, name))
 
-recs_bnd_sf_6</code></pre>
+recs_bnd_sf_7</code></pre>
 <pre><code>## Simple feature collection with 9 features and 4 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -912,7 +942,7 @@ recs_bnd_sf_6</code></pre>
 </p>
 </div>
 <div id="add-a-column-for-abbreviated-name" class="section level3">
-<h3>5) Add a column for abbreviated name</h3>
+<h3>6) Add a column for abbreviated name</h3>
 <p>To add an abbreviated name column programmatically, we could do
 something similar as above but use <code>case_when()</code> to get the
 correct abbreviation for each REC name. That would be a bit klunky.
@@ -951,10 +981,10 @@ rec_abbrev_tbl</code></pre>
 </p>
 <p>Once we have the lookup table, we can bring in the new column with a
 simple join:</p>
-<pre class="r"><code>recs_bnd_sf_7 &lt;- recs_bnd_sf_6 %&gt;% 
+<pre class="r"><code>recs_bnd_sf_8 &lt;- recs_bnd_sf_7 %&gt;% 
   left_join(rec_abbrev_tbl, by = &quot;name&quot;)
 
-recs_bnd_sf_7</code></pre>
+recs_bnd_sf_8</code></pre>
 <pre><code>## Simple feature collection with 9 features and 5 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -977,10 +1007,10 @@ recs_bnd_sf_7</code></pre>
 </p>
 <p>Finally, in preparation for exporting this, let’s rearrange the order
 of the columns:</p>
-<pre class="r"><code>recs_bnd_sf_8 &lt;- recs_bnd_sf_7 %&gt;% 
+<pre class="r"><code>recs_bnd_sf_9 &lt;- recs_bnd_sf_8 %&gt;%
   relocate(objectid, name, abbrev, acres, brochure, geom)
 
-recs_bnd_sf_8</code></pre>
+recs_bnd_sf_9</code></pre>
 <pre><code>## Simple feature collection with 9 features and 5 fields
 ## Geometry type: GEOMETRY
 ## Dimension:     XY
@@ -1005,7 +1035,7 @@ recs_bnd_sf_8</code></pre>
 </p>
 </div>
 <div id="create-a-point-version-of-the-layer" class="section level3">
-<h3>6) Create a point version of the layer</h3>
+<h3>7) Create a point version of the layer</h3>
 <p>Finally, let’s create a point version of the layer, that we can
 display on the web map when zoomed out. We’ll keep all the attribute
 fields so we can use the same expressions for labels or popups.</p>
@@ -1013,7 +1043,7 @@ fields so we can use the same expressions for labels or popups.</p>
 with <code>st_center()</code>. For complex geometries we might need to
 do something more sophisticated, but centroids will work fine for these
 features:</p>
-<pre class="r"><code>recs_ctr_sf &lt;- recs_bnd_sf_8 %&gt;% st_centroid()</code></pre>
+<pre class="r"><code>recs_ctr_sf &lt;- recs_bnd_sf_9 %&gt;% st_centroid()</code></pre>
 <pre><code>## Warning in st_centroid.sf(.): st_centroid assumes attributes are constant over
 ## geometries of x</code></pre>
 <pre class="r"><code>recs_ctr_sf</code></pre>
@@ -1041,7 +1071,7 @@ features:</p>
 <h3>Export layers as GeoJSON</h3>
 <p>Next we’ll export our cleaned-up boundary and point objects to
 GeoJSON:</p>
-<pre class="r"><code>st_write(recs_bnd_sf_8, dsn = &quot;recs_bnd_3857.geojson&quot;, delete_dsn = TRUE)</code></pre>
+<pre class="r"><code>st_write(recs_bnd_sf_9, dsn = &quot;recs_bnd_3857.geojson&quot;, delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `recs_bnd_3857.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `recs_bnd_3857&#39; to data source 
 ##   `recs_bnd_3857.geojson&#39; using driver `GeoJSON&#39;
@@ -1077,11 +1107,13 @@ much more compactly thanks to the use of pipes.</p>
 <pre class="r"><code>library(sf)
 library(dplyr)
 library(units)
-library(arcgisbinding)
-
-arc.check_product()
-
-epsg_webmerc &lt;- 3857
+library(arcgisbinding)</code></pre>
+<pre><code>## *** Please call arc.check_product() to define a desktop license.</code></pre>
+<pre class="r"><code>arc.check_product()</code></pre>
+<pre><code>## product: ArcGIS Pro (12.9.3.32739)
+## license: Advanced
+## version: 1.0.1.300</code></pre>
+<pre class="r"><code>epsg_webmerc &lt;- 3857
 
 rec_abbrev_tbl &lt;- c(&quot;Desert&quot;, &quot;DREC&quot;,
                     &quot;Hansen&quot;, &quot;HAREC&quot;,
@@ -1094,9 +1126,12 @@ rec_abbrev_tbl &lt;- c(&quot;Desert&quot;, &quot;DREC&quot;,
                     &quot;Westside&quot;, &quot;WSREC&quot;) %&gt;% 
   matrix(ncol = 2, byrow = TRUE) %&gt;% 
   as_tibble() %&gt;% 
-  setNames(c(&quot;name&quot;, &quot;abbrev&quot;))
-
-recs_bnd_url &lt;- &quot;https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0&quot;
+  setNames(c(&quot;name&quot;, &quot;abbrev&quot;))</code></pre>
+<pre><code>## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.
+## Using compatibility `.name_repair`.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.</code></pre>
+<pre class="r"><code>recs_bnd_url &lt;- &quot;https://geodata.ucanr.edu/arcgis/rest/services/REC_Data/FeatureServer/0&quot;
 
 recs_bnd_sf &lt;- recs_bnd_url %&gt;% 
   arc.open() %&gt;%                                            ## create connection object
@@ -1120,14 +1155,23 @@ recs_bnd_sf &lt;- recs_bnd_url %&gt;%
 
 ## Export polygons
 recs_bnd_sf %&gt;% 
-  st_write(dsn = &quot;recs_bnd_3857.geojson&quot;,                   ## save to disk as geojson
-           delete_dsn = TRUE)                               ## overwrite the existing file    
-
-## Export centroids
+  st_write(dsn = &quot;recs_bnd_3857_cmpact.geojson&quot;,            ## save to disk as geojson
+           delete_dsn = TRUE)                               ## overwrite the existing file    </code></pre>
+<pre><code>## Deleting source `recs_bnd_3857_cmpact.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `recs_bnd_3857_cmpact&#39; to data source 
+##   `recs_bnd_3857_cmpact.geojson&#39; using driver `GeoJSON&#39;
+## Writing 9 features with 5 fields and geometry type Unknown (any).</code></pre>
+<pre class="r"><code>## Export centroids
 recs_bnd_sf %&gt;% 
   st_centroid() %&gt;%                                         ## get the centroid of each polygon
-  st_write(dsn = &quot;recs_ctr_3857.geojson&quot;,                   ## save to disk as geojson
+  st_write(dsn = &quot;recs_ctr_3857_compact.geojson&quot;,           ## save to disk as geojson
            delete_dsn = TRUE)                               ## overwrite the existing file</code></pre>
+<pre><code>## Warning in st_centroid.sf(.): st_centroid assumes attributes are constant over
+## geometries of x</code></pre>
+<pre><code>## Deleting source `recs_ctr_3857_compact.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `recs_ctr_3857_compact&#39; to data source 
+##   `recs_ctr_3857_compact.geojson&#39; using driver `GeoJSON&#39;
+## Writing 9 features with 5 fields and geometry type Point.</code></pre>
 </div>
 
 

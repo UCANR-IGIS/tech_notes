@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"name": "recs_ctr_3857_compact",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+"features": [
+{ "type": "Feature", "properties": { "objectid": 1, "name": "Desert", "abbrev": "DREC", "acres": 359.9, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44692.pdf" }, "geometry": { "type": "Point", "coordinates": [ -12851153.986225729808211, 3870418.691149828024209 ] } },
+{ "type": "Feature", "properties": { "objectid": 2, "name": "Hansen", "abbrev": "HAREC", "acres": 39.1, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44456.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13258795.344932056963444, 4072599.559753139037639 ] } },
+{ "type": "Feature", "properties": { "objectid": 3, "name": "Hopland", "abbrev": "HREC", "acres": 8770.5, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44828.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13701028.178820757195354, 4723679.58169871289283 ] } },
+{ "type": "Feature", "properties": { "objectid": 4, "name": "Intermountain", "abbrev": "IREC", "acres": 260.9, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43726.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13522096.78449784219265, 5155538.110276624560356 ] } },
+{ "type": "Feature", "properties": { "objectid": 5, "name": "Kearney", "abbrev": "KARE", "acres": 309.8, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43727.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13303071.465541349723935, 4383221.020870759151876 ] } },
+{ "type": "Feature", "properties": { "objectid": 6, "name": "Lindcove", "abbrev": "LREC", "acres": 272.5, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43728.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13253524.548836335539818, 4349797.344755966216326 ] } },
+{ "type": "Feature", "properties": { "objectid": 7, "name": "Sierra Foothill", "abbrev": "SFREC", "acres": 9482.1, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43729.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13503304.730643060058355, 4758554.966065535321832 ] } },
+{ "type": "Feature", "properties": { "objectid": 8, "name": "South Coast", "abbrev": "SCREC", "acres": 289.1, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers44604.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13104591.782145658507943, 3987406.564490068238229 ] } },
+{ "type": "Feature", "properties": { "objectid": 9, "name": "Westside", "abbrev": "WSREC", "acres": 485.1, "brochure": "http://ucanr.edu/sites/rec/newsletters/REC_Marketing_Flyers_for_Researchers43730.pdf" }, "geometry": { "type": "Point", "coordinates": [ -13370872.705588413402438, 4347347.412877953611314 ] } }
+]
+}
