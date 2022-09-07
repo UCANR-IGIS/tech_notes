@@ -12,7 +12,7 @@
 <meta name="author" content="Andy Lyons" />
 
 
-<title>Preparing Reference GIS Layers for a Web Map</title>
+<title>Preparing Reference GIS Layers for a Web Map with R</title>
 
 <script src="lib/header-attrs-2.14/header-attrs.js"></script>
 <script src="lib/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -197,7 +197,7 @@ pre code {
 
 
 <h1 class="title toc-ignore">Preparing Reference GIS Layers for a Web
-Map</h1>
+Map with R</h1>
 <h4 class="author"><a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy
 Lyons</a></h4>
 <h4 class="date">August 2022</h4>
@@ -266,12 +266,6 @@ for some examples). Once you figure out what you need to do, all of the
 above can be done using desktop GIS software like ArcGIS Pro or QGIS.
 Some operations can also be done in your web mapping platforms (like
 ArcGIS.com).</p>
-<div style="float:right; padding:10px; text-align:center;">
-<p><img src="images/worried_bg-trans_80x80.png"
-style="padding:2px;" /><br/> <em>I have to do<br/>that again?</em></p>
-</div>
-<p><br />
-</p>
 <p>The <strong>pain point</strong> however comes when a new version of
 the authoritative data is released by the publisher. The changes may
 only be to a small number of features, but if you want your web map to
@@ -279,10 +273,14 @@ be current you now have to repeat the entire process of transforming the
 data for your web map. Hopefully you wrote down that sequence of
 geoprocessing steps you carefully developed 15 months ago? Hopefully it
 won’t take too long to go through the workflow all over again?</p>
-<div style="clear:both;">
+<div style="text-align:center;">
+<p><img src="images/worried_bg-trans_80x80.png" /></p>
+<p><span style="font-size:150%;"><em>I have to do this
+again?</em></span></p>
+<p><img src="images/data-cleaning-pipeline_650x400.png" /></p>
+</div>
 <p><br />
 </p>
-</div>
 </div>
 <div id="scripting-to-the-rescue" class="section level2">
 <h2>Scripting to the Rescue!</h2>
@@ -838,12 +836,12 @@ recs_bnd_sf_4</code></pre>
 <p><br />
 </p>
 <p>After this step, you can now see that there is only one feature for
-‘Lindcove’</p>
+‘Lindcove’.</p>
 <p><br />
 </p>
 </div>
 <div id="b-regenerate-objectid" class="section level3">
-<h3>3b) Regenerate <code>objectid</code></h3>
+<h3>3b) (Re)generate <code>objectid</code></h3>
 <p>We can regenerate a unique id field using <code>mutate()</code> with
 <code>row_number()</code>.</p>
 <pre class="r"><code>recs_bnd_sf_5 &lt;- recs_bnd_sf_4 %&gt;% 
@@ -871,15 +869,15 @@ recs_bnd_sf_5</code></pre>
 <p><br />
 </p>
 </div>
-<div id="recompute-the-area-of-each-rec-rounded-to-the-nearest-acre"
-class="section level3">
-<h3>4) (Re)compute the area of each REC rounded to the nearest acre</h3>
+<div id="recompute-the-area-of-each-rec" class="section level3">
+<h3>4) (Re)compute the area of each REC</h3>
 <p>Although the original layer had a field for area in acres, you have
 to recompute area after any operation that alters geometries (such as
 dissolve). <code>st_area()</code> returns the area of each polygon as a
 units object (i.e., numeric values with units attached, which it
 determines from the CRS info). This makes it easy to convert them to our
-preferred units using <code>set_units()</code>.</p>
+preferred units using <code>set_units()</code> and round it to one
+decimal place with <code>round()</code>.</p>
 <p>Computing area of data projected in Web Mercator is not ideal, as
 Mercator is well known to distort area to preserve angles. However at
 the scale of our features and our desired level of precision (0.1 acre),
@@ -1172,6 +1170,8 @@ recs_bnd_sf %&gt;%
 ## Writing layer `recs_ctr_3857_compact&#39; to data source 
 ##   `recs_ctr_3857_compact.geojson&#39; using driver `GeoJSON&#39;
 ## Writing 9 features with 5 fields and geometry type Point.</code></pre>
+<p><br />
+</p>
 </div>
 
 

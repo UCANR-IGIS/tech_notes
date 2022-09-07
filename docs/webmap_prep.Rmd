@@ -1,5 +1,5 @@
 ---
-title: "Preparing Reference GIS Layers for a Web Map"
+title: "Preparing Reference GIS Layers for a Web Map with R"
 author: "<a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy Lyons</a>"
 date: "August 2022"
 output:
@@ -51,17 +51,19 @@ If you're lucky (or your goals are flexible), you may be able to use a reference
 
 The first step is to determine what needs to be done to get the 'authoritative' reference data ready for your web map. This will largely depend on the design and functionality of your web map (see table below for some examples). Once you figure out what you need to do, all of the above can be done using desktop GIS software like ArcGIS Pro or QGIS. Some operations can also be done in your web mapping platforms (like ArcGIS.com).
 
-<div style="float:right; padding:10px; text-align:center;">
-![](./images/worried_bg-trans_80x80.png){style="padding:2px;"}<br/>
-*I have to do<br/>that again?*
+The **pain point** however comes when a new version of the authoritative data is released by the publisher. The changes may only be to a small number of features, but if you want your web map to be current you now have to repeat the entire process of transforming the data for your web map. Hopefully you wrote down that sequence of geoprocessing steps you carefully developed 15 months ago? Hopefully it won't take too long to go through the workflow all over again?
+
+<div style="text-align:center;">
+
+![](./images/worried_bg-trans_80x80.png)
+
+<span style="font-size:150%;">*I have to do this again?*</span>
+
+![](./images/data-cleaning-pipeline_650x400.png)
+
 </div>
 
 \
-
-The **pain point** however comes when a new version of the authoritative data is released by the publisher. The changes may only be to a small number of features, but if you want your web map to be current you now have to repeat the entire process of transforming the data for your web map. Hopefully you wrote down that sequence of geoprocessing steps you carefully developed 15 months ago? Hopefully it won't take too long to go through the workflow all over again?
-
-<div style="clear:both;">\
-</div>
 
 ## Scripting to the Rescue!
 
@@ -497,5 +499,6 @@ recs_bnd_sf %>%
   st_write(dsn = "recs_ctr_3857_compact.geojson",           ## save to disk as geojson
            delete_dsn = TRUE)                               ## overwrite the existing file
 ```
+\
 
 
