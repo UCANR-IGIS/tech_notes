@@ -1,0 +1,161 @@
+---
+title: "Downloading Census Geometries with Tigris"
+author: "<a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy Lyons</a>"
+date: "March 2023"
+output:
+  html_document: 
+    mathjax: null
+    self_contained: no
+    lib_dir: lib
+    includes:
+      in_header: gtag_technotes.js
+      before_body: tech_note_header.html
+      after_body: tech_note_footer.html
+---   
+
+```{css echo = FALSE}
+h1.title {font-weight:bold;}
+h1 {font-size:30px; font-weight:bold;}
+h2 {font-size:24px; font-weight:bold;}
+h3 {font-size:18px; font-weight:bold;}
+h4.date,h4.author {font-size:100%;}
+```
+```{r setup, include = FALSE}
+library(tigris)
+library(dplyr)
+library(sf)
+library(leaflet)
+```
+
+
+<p style="font-style:italic; font-size:90%; margin:2em;">IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques for using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
+
+## Background
+
+The US Census Bureau reports most of their data by Census Tracts and Blocks, but they also maintain GIS data for many administrative boundaries which they use for other kinds of data summaries. You can download these geographies as GIS data.
+
+![](./images/census_geoms_diagram.png){style="display:block; margin:1em auto; width:660px;"}
+
+In this Tech Note, we will download the boundaries of incorporated cities and towns in California, using the Census API. We will do this in R using the [tigris](https://cran.r-project.org/web/packages/tigris/index.html) package by Kyle Walker.
+
+\
+
+## 1\. Load packages:
+
+```{r}
+library(tigris)
+library(dplyr)
+library(sf)
+library(leaflet)
+```
+
+\
+
+Set Tigris cache option:
+
+```{r}
+options(tigris_use_cache = TRUE)
+```
+
+\
+
+## 2/. Get the Places Dataset
+
+Incorporated cities and towns are part of the [Places](https://www2.census.gov/geo/pdfs/reference/GARM/Ch9GARM.pdf) dataset, which we can download via `places()`.
+
+```{r}
+ca_places_sf <- places(state = "CA", cb = FALSE, progress_bar = FALSE) |> st_transform(4326)
+dim(ca_places_sf)
+head(ca_places_sf)
+```
+
+\
+
+Reading the docs, we can use the Legal/Statistical Area Description (LSAD) column to pull out the incorporated cities and towns. Let see what it contains:
+
+```{r}
+ca_places_sf$LSAD |> table()
+```
+
+\
+
+Looking up the [codes](https://www.census.gov/library/reference/code-lists/legal-status-codes.html), we find:
+
+
+25\. City (suffix). Consolidated City, County or Equivalent Feature, County Subdivision, Economic Census Place, Incorporated Place
+
+43\. Town (suffix). County Subdivision, Economic Census Place, Incorporated Place
+
+57\. CDP (suffix). Census Designated Place, Economic Census Place (**not** incorporated)
+
+\
+
+Therefore, we want the Places where the LSAD is 25 (cities) or 43 (towns):
+
+```{r}
+ca_cities_towns_sf <- ca_places_sf |> 
+  filter(LSAD %in% c(25, 43))
+
+dim(ca_cities_towns_sf)
+```
+
+\
+
+## 3\. Plot the results
+
+To plot the results, first download the state boundary:
+
+```{r}
+cabnd_sf <- states(cb = TRUE) |> filter(GEOID == "06") |> st_transform(4326)
+```
+
+\
+
+Make a version of the cities & towns layer that includes a column of color values:
+
+```{r}
+random_cols <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588", "#5F7FC7", "#673770", "#D3D93E", "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B", "#CD9BCD", "#D14285", "#6DDE88", "#652926", "#7FDCC0", "#C84248", "#8569D5", "#5E738F", "#D1A33D", "#8A7C64", "#599861")
+
+ca_cities_towns_4map_sf <- ca_cities_towns_sf |> 
+  mutate(col = sample(random_cols, nrow(ca_cities_towns_sf), replace = TRUE)) |> 
+  select(NAMELSAD, col)
+```
+
+\
+
+Plot them in leaflet:
+
+```{r leaflet_map, cache = FALSE}
+leaflet(cabnd_sf) |> 
+  addProviderTiles("CartoDB.Positron") |> 
+  addPolygons(fill = FALSE, color = "black", weight = 5) |> 
+  addPolygons(data = ca_cities_towns_4map_sf, color = "#777", weight = 1,
+              fill = TRUE, fillColor = ~col, popup = ~NAMELSAD)
+```
+
+\
+
+Looks good!
+
+## 4\. Export as CSV and GeoJSON
+
+```{r}
+ca_cities_towns_sf |> 
+  select(GEOID, NAME, LSAD, LAND_AREA_M2 = ALAND) |> 
+  st_drop_geometry() |> 
+  write.csv(file = "./outputs/ca_cities_towns_2021.csv", row.names = FALSE)
+```
+
+\
+
+Save as GeoJSON:
+
+```{r}
+ca_cities_towns_sf |> 
+  select(GEOID, NAME, LSAD, LAND_AREA_M2 = ALAND) |> 
+  st_write(dsn = "./outputs/ca_cities_towns_2021.geojson", delete_dsn = TRUE)
+```
+
+\
+
+Done!

@@ -8,4 +8,5 @@
 docs/recs_bnd_3857.geojson
 docs/recs_ctr_3857.geojson
 docs/webmap_prep_cache/*
+docs/download-census-geometries_cache/*
 docs/hide/*
