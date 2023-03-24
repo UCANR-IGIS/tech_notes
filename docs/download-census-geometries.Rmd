@@ -1,5 +1,5 @@
 ---
-title: "Importing Administrative Boundaries from the US Census into R with tigris"
+title: "Downloading Administrative Boundaries from the US Census with R"
 author: "<a href='https://ucanr.edu/?facultyid=32909' target='_blank'>Andy Lyons</a>"
 date: "March 2023"
 output:
