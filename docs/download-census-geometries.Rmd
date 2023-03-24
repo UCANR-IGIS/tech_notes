@@ -82,7 +82,7 @@ All of these functions bring the spatial data into R as [`sf`](https://r-spatial
 
 \
 
-## Example: Import California Incorporated Cities and Towns
+## Example: Import Incorporated California Cities and Towns
 
 In this example, we'll import the the boundaries of incorporated cities and towns in California using `tigris`.
 
