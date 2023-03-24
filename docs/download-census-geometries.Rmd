@@ -196,7 +196,7 @@ Save the attribute table as a CSV file:
 
 ```{r}
 ca_cities_towns_sf |> 
-  select(GEOID, NAME, LSAD, LAND_AREA_M2 = ALAND) |> 
+  select(GEOID, NAME, LSAD, LAND_AREA_M2 = ALAND, WATER_AREA_M2 = AWATER) |> 
   st_drop_geometry() |> 
   write.csv(file = "./outputs/ca_cities_towns_2021.csv", row.names = FALSE)
 ```
