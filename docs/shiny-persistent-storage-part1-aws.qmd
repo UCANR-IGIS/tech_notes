@@ -26,7 +26,7 @@ h1.title {
   border-top-color: rgb(237, 169, 31);
   border-top-width: 5px;
   border-top-style: solid;
-  margin-top:1em;
+  margin-top:0.5em;
   line-height:1.5;
   
 }
@@ -61,7 +61,7 @@ img.screenshot, div.json-chunk {
 
 :::{.author}
 [Andy Lyons](https://ucanr.edu/?facultyid=32909)  
-December, 2023
+January, 2024
 :::
 
 :::{.about-technotes}
@@ -122,6 +122,8 @@ Depending on the platform and the service, you can dial in permissions even furt
 It should be no surprise that putting your passwords in your code is a bad idea (although we've all done it!). If you're working on your laptop or a server that you control, a common best practice is to store your passwords as environment variables (i.e., in your `.Renviron` file), and bring them into your script via `Sys.getenv()`. For stronger security, you can use a package like [`keyring`](https://cran.r-project.org/web/packages/keyring/index.html) that has functions to save credentials within the operating system. Another option is to store your credentials in an external file, such as a JSON or text file. This last one is in fact is what we have to use for publishing a Shiny app on ShinyApps.io, as described below.
 
 Keeping your credentials out of your code allows you to safely use version control and share you code with colleagues (two other best practices). But this requires you take precautions that they don't accidentally get "checked in" to a version control system (i.e. GitHub). This kind of unintentional escape is actually far more common than malicious hackers breaking into your server. To prevent credentials from being saved to GitHub, you need to either keep then out from the project folder, or configure your version control system to ensure they don't get checked-in. 
+
+\
 
 ::: {.callout-tip title="A Solution for Saving Credentials for a Shiny App"}
 In the case of a Shiny app on ShinyApps.io, credentials do in fact need to be included among the files you upload when you publish the app. This is because ShinyApps.io doesn't allow you to set up environment variables on the server (in part because you're not using your own dedicated server but rather a VM running on a shared server). Other hosting services may allow you to set up environment variables, which you should definitely take advantage of when available.
