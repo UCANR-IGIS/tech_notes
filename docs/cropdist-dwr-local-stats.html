@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Andy Lyons">
+<meta name="dcterms.date" content="2024-09-25">
+<title>Summarizing Crop Distribution for any Area of Interest in California</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="cropdist-dwr-local-stats_files/libs/clipboard/clipboard.min.js"></script>
+<script src="cropdist-dwr-local-stats_files/libs/quarto-html/quarto.js"></script>
+<script src="cropdist-dwr-local-stats_files/libs/quarto-html/popper.min.js"></script>
+<script src="cropdist-dwr-local-stats_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="cropdist-dwr-local-stats_files/libs/quarto-html/anchor.min.js"></script>
+<link href="cropdist-dwr-local-stats_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="cropdist-dwr-local-stats_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="cropdist-dwr-local-stats_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="cropdist-dwr-local-stats_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="cropdist-dwr-local-stats_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light"><!-- Global site tag (gtag.js) - Google Analytics --><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-WFBV8LKRHQ"></script><script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WFBV8LKRHQ');
+</script><link href="cropdist-dwr-local-stats_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="cropdist-dwr-local-stats_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script><script src="cropdist-dwr-local-stats_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><link href="cropdist-dwr-local-stats_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="cropdist-dwr-local-stats_files/libs/leaflet-1.3.1/leaflet.js"></script><link href="cropdist-dwr-local-stats_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="cropdist-dwr-local-stats_files/libs/proj4-2.6.2/proj4.min.js"></script><script src="cropdist-dwr-local-stats_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script><link href="cropdist-dwr-local-stats_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="cropdist-dwr-local-stats_files/libs/leaflet-binding-2.2.2/leaflet.js"></script><script src="cropdist-dwr-local-stats_files/libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script><script src="cropdist-dwr-local-stats_files/libs/leaflet-providers-plugin-2.2.2/leaflet-providers-plugin.js"></script><link href="cropdist-dwr-local-stats_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="cropdist-dwr-local-stats_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+</head>
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2"><h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+<li><a href="#summary" id="toc-summary" class="nav-link active" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#import-an-area-of-interest" id="toc-import-an-area-of-interest" class="nav-link" data-scroll-target="#import-an-area-of-interest">Import an Area of Interest</a></li>
+  <li><a href="#open-the-2021-statewide-crop-mapping-dataset" id="toc-open-the-2021-statewide-crop-mapping-dataset" class="nav-link" data-scroll-target="#open-the-2021-statewide-crop-mapping-dataset">Open the 2021 Statewide Crop Mapping dataset</a></li>
+  <li><a href="#exploring-the-statewide-crop-distribution-layer" id="toc-exploring-the-statewide-crop-distribution-layer" class="nav-link" data-scroll-target="#exploring-the-statewide-crop-distribution-layer">Exploring the Statewide Crop Distribution Layer</a></li>
+  <li><a href="#which-attribute-field-contains-the-crop" id="toc-which-attribute-field-contains-the-crop" class="nav-link" data-scroll-target="#which-attribute-field-contains-the-crop">Which attribute field contains the ‘crop’?</a></li>
+  <li><a href="#figuring-out-the-codes" id="toc-figuring-out-the-codes" class="nav-link" data-scroll-target="#figuring-out-the-codes">Figuring out the codes</a></li>
+  <li><a href="#import-the-crop-type-codes" id="toc-import-the-crop-type-codes" class="nav-link" data-scroll-target="#import-the-crop-type-codes">Import the Crop Type codes</a></li>
+  <li><a href="#import-the-statewide-crop-mapping-layer-for-just-the-aoi" id="toc-import-the-statewide-crop-mapping-layer-for-just-the-aoi" class="nav-link" data-scroll-target="#import-the-statewide-crop-mapping-layer-for-just-the-aoi">Import the Statewide Crop Mapping layer for Just the AOI</a></li>
+  <li><a href="#intersect-the-crop-polygons-with-the-aoi" id="toc-intersect-the-crop-polygons-with-the-aoi" class="nav-link" data-scroll-target="#intersect-the-crop-polygons-with-the-aoi">Intersect the Crop Polygons with the AOI</a></li>
+  <li><a href="#compute-the-total-area-for-each-crop" id="toc-compute-the-total-area-for-each-crop" class="nav-link" data-scroll-target="#compute-the-total-area-for-each-crop">Compute the Total Area for Each Crop</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul></nav>
+</div>
+<main class="content" id="quarto-document-content"><div style="background-color:#1C2C53; color:white; padding:8px;">
+<img src="images/ucanr_2019_white_232x30.png" style="width:232px; height:30px; margin:15px;"><a href="http://igis.ucanr.edu/">
+<img src="images/igis-shield_54x54.png" style="width:54px; height:54px; margin:4px; float:right;"></a>
+</div>
+<div style="clear:both;"></div>
+
+
+<header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">Summarizing Crop Distribution for any Area of Interest in California</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Andy Lyons <a href="https://orcid.org/0000-0002-7505-6709" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://igis.ucanr.edu/">
+            UC Division of Agriculture and Natural Resources
+            </a>
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 25, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header><div class="cell">
+<style type="text/css">
+h1.title {
+  font-family: Muli, "Open Sans", sans-serif;
+  font-weight:600; 
+  font-size:2.5rem; 
+  border-top-color: rgb(237, 169, 31);
+  border-top-width: 5px;
+  border-top-style: solid;
+  margin-top:0.5em;
+  line-height:1.5;
+  
+}
+p.subtitle {
+  font-family: Muli, "Open Sans", sans-serif;
+  font-size:2rem;
+  font-weight:500; 
+}
+h2 {
+  font-size:1.5rem;
+  font-weight:500; 
+  font-family:Muli,"Open Sans",sans-serif;
+}
+h3 {font-size:1.2rem; font-weight:500;}
+h4.date,h4.author {font-size:100%;}
+div.protip {padding:0.5em; background-color:#ddd; border:2px solid gray; margin:0 3em;}
+
+div.about-technotes {
+  font-style:italic; 
+  font-size:90%; 
+  margin:2em;
+}
+div.author {
+  font-size:90%; 
+}
+img.screenshot, div.json-chunk {
+  border:1px solid gray;
+}
+</style>
+</div>
+<div class="about-technotes">
+<p>IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques for using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
+</div>
+<section id="summary" class="level2"><h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>This Tech Note illustrates how to tabulate the distribution of crops for any area of interest in CA using R. For the crop layer, it uses the 2021<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <a href="https://data.cnra.ca.gov/dataset/statewide-crop-mapping">Statewide Crop Mapping Layer</a> from <a href="https://data.cnra.ca.gov/organization/dwr">CA DWR</a>. For the area-of-interest, the example uses a groundwater basin, but the method will work with any polygon in CA.</p>
+<p>More specifically, this Tech Note shows how to:</p>
+<ol type="1">
+<li>Import a polygon area-of-interest from a local GIS file</li>
+<li>Import the 2021 Statewide Crop Mapping Layer for the AOI using the downloaded geodatabase</li>
+<li>Intersect the AOI with the crop polygons</li>
+<li>Compute for each the total areas of each crop, including the percent of the AOI</li>
+</ol></section><section id="setup" class="level2"><h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>To begin we load the packages we’ll be using:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/">leaflet</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-quantities.github.io/units/">units</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we define a few EPSG codes (i.e., projections) that we’ll need later:</p>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">epsg_geo_wgs84</span> <span class="op">&lt;-</span> <span class="fl">4326</span></span>
+<span><span class="va">epsg_geo_nad83</span> <span class="op">&lt;-</span> <span class="fl">4269</span></span>
+<span><span class="va">epsg_utm11n_wgs84</span> <span class="op">&lt;-</span> <span class="fl">32611</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+</section><section id="import-an-area-of-interest" class="level2"><h2 class="anchored" data-anchor-id="import-an-area-of-interest">Import an Area of Interest</h2>
+<p>Next, we import our area-of-interest from a GIS file. For this example, we will use the groundwater basin for Imperial Valley which has been saved as a geojson file (<a href="https://ucanr-igis.github.io/sketchbook/groundwater-basins-import.html">source</a>). But the same basic technique would work with any polygon as long as it falls within California.</p>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">impval_gndwtr_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html">st_read</a></span><span class="op">(</span><span class="st">"imperial-valley-groundwater-basin-2016.geojson"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `imperial-valley-groundwater-basin-2016' from data source 
+  `D:\GitHub\tech_notes\tech_notes\docs\imperial-valley-groundwater-basin-2016.geojson' 
+  using driver `GeoJSON'
+Simple feature collection with 1 feature and 8 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: -115.8418 ymin: 32.63896 xmax: -114.8255 ymax: 33.32349
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## Preview it</span></span>
+<span><span class="fu"><a href="https://rstudio.github.io/leaflet/reference/leaflet.html">leaflet</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">impval_gndwtr_sf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/addProviderTiles.html">addProviderTiles</a></span><span class="op">(</span><span class="st">"Esri.WorldImagery"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">leaflet</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/leaflet/reference/map-layers.html">addPolygons</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-d18b28050303acbafd83" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-d18b28050303acbafd83">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["Esri.WorldImagery",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addPolygons","args":[[[[{"lng":[-115.3322069999603,-115.1327330970367,-115.0061485789116,-114.8255262579082,-114.848806517111,-114.8758038971618,-114.8961356915661,-114.9258410870582,-114.9615121602162,-115.0186944555595,-115.0520978252075,-115.0866746757893,-115.1620579571914,-115.1806199240605,-115.1981585786671,-115.2508229455109,-115.2523050219992,-115.292700838293,-115.2941302312848,-115.327016649233,-115.3758303220344,-115.3986873390928,-115.4128988737372,-115.4268300666392,-115.4469632417376,-115.463967620634,-115.4795169066365,-115.4797566094936,-115.5008380264429,-115.5339546313944,-115.6120221695952,-115.6258429281079,-115.6291717108516,-115.6476688130691,-115.6700442100661,-115.6884291360608,-115.6916351541395,-115.7179032584864,-115.7410529538509,-115.750591183791,-115.7508471587312,-115.7804671711523,-115.7833529353407,-115.7982630251028,-115.8334639146512,-115.8418000226713,-115.84178399493,-115.8416635973258,-115.8329639572798,-115.8143701891512,-115.812966096311,-115.8100306238464,-115.8101828748123,-115.8106948714051,-115.812291408532,-115.8042522035948,-115.8035443994228,-115.7999973107936,-115.7941008339474,-115.7935692028774,-115.7919842414413,-115.7902604588527,-115.7903325468576,-115.7790715826629,-115.7709727197092,-115.7340270350794,-115.7242792488448,-115.7230633081408,-115.7178139659472,-115.7156299845234,-115.7103369123417,-115.7022782211492,-115.6954076363617,-115.6942206357829,-115.6867024725751,-115.681032125042,-115.6760028772795,-115.6734107076788,-115.6692182675528,-115.6646318272416,-115.6605576314582,-115.6543169291782,-115.648337796546,-115.6389481659202,-115.628649007239,-115.6169115487698,-115.6139020506341,-115.6125475097633,-115.6081102787224,-115.6020289690149,-115.5986345876958,-115.5989204801282,-115.6008275926966,-115.6030578705953,-115.6051988577512,-115.609829995536,-115.6144414260802,-115.6232825426985,-115.630173898332,-115.642362619196,-115.5012604205778,-115.4227490364731,-115.3322069999603],"lat":[33.1278407245879,33.00031965179324,32.89859528663663,32.71166827822,32.71008863066087,32.70827924899133,32.7069588172461,32.70495536679396,32.70260405890945,32.69861035682275,32.69630894307998,32.69388027034682,32.6886869262865,32.68741592771935,32.68618721861804,32.68248092550312,32.68237440743084,32.67946343512893,32.67936170723817,32.67701610320435,32.67367056250004,32.67196308946949,32.67089905934061,32.66992026036326,32.66850260116257,32.66723800940714,32.6660793293766,32.6660631453145,32.66463779066375,32.66213217812005,32.65629287947307,32.65529036492096,32.65504092403268,32.65365301519645,32.65196994221209,32.65058362246717,32.6503415565949,32.64840442512659,32.64665759907545,32.64593644531995,32.64591708073195,32.64363633923161,32.64341828983056,32.64229047355056,32.63958870684299,32.63896314351913,32.63911032375816,32.64021591409236,32.72309247630497,32.94293667654841,32.94307278751646,32.94444106547996,32.9475974321827,32.95114396561633,32.95453672400662,32.9633791708295,32.96415745257624,32.9684209972682,32.98345939821672,32.98523982972343,32.9905468398395,33.0007350877158,33.01577621997509,33.0288338838163,33.0382216043178,33.07083281275911,33.09381030766144,33.09667554006085,33.0976798512874,33.09827413625076,33.09952708670086,33.10269603242322,33.10831596404744,33.11651773044116,33.11956627071208,33.12339851246391,33.13484283467862,33.1398495599317,33.14761939954374,33.15659620974736,33.1630472841745,33.17066340043186,33.17747502911885,33.18408748486476,33.18887402780924,33.19315641989929,33.19793584784146,33.20436185344339,33.20949643874047,33.21401526903814,33.22097383913509,33.23368520033984,33.24506527330472,33.25489632919464,33.26289538267027,33.27373651430889,33.28285948913634,33.29744276541955,33.30860641305468,33.32349469212303,33.23471444974098,33.18514944533451,33.1278407245879]},{"lng":[-115.7991545078008,-115.7972122351722,-115.7931623504954,-115.7925780808446,-115.7926632303538,-115.7936238294298,-115.7946681901179,-115.7972375326289,-115.7989571676959,-115.8022189010852,-115.8058079212752,-115.8036304077214,-115.8046095309569,-115.804790773252,-115.8032529949278,-115.8014787863091,-115.7991545078008],"lat":[32.93671745934573,32.93603857322762,32.93692801228415,32.93896069156597,32.94073951477409,32.94369526930184,32.94555583506666,32.9465004580242,32.94822192273651,32.94937261707206,32.94740669896527,32.94610356568031,32.94376948033393,32.94186625751658,32.93967784837186,32.9382458223613,32.93671745934573]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[32.63896314351913,33.32349469212303],"lng":[-115.8418000226713,-114.8255262579082]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><br></p>
+</section><section id="open-the-2021-statewide-crop-mapping-dataset" class="level2"><h2 class="anchored" data-anchor-id="open-the-2021-statewide-crop-mapping-dataset">Open the 2021 Statewide Crop Mapping dataset</h2>
+<p>This Tech Note uses a local copy of the 2021 Statewide Crop Mapping data saved as a geodatabase. This copy was downloaded from the <a href="https://data.cnra.ca.gov/dataset/statewide-crop-mapping/resource/cd1ce211-ac75-44b4-9ea4-345ce2fd0548">CNRA Open Data Hub</a> and unzipped.</p>
+<p>We are using a local copy of the crop distribution data because:</p>
+<ol type="1">
+<li>accessing a local geodatabase will give us the fastest performance (compared to importing the data from the CNRA ArcGIS Server, although that can also be done).</li>
+<li>the size of the data is manageable (the zip file is 90 MB, and unzipped is 207 MB).</li>
+<li>the links to the online layers (i.e., Map Service) seem to be broken (or require a login), so there is not much alternative.</li>
+</ol>
+<p><br></p>
+<p>Step 1 is to view the layers in the geodatabase:</p>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">dwr_cropmapping_gdb</span> <span class="op">&lt;-</span> <span class="st">"i15_Crop_Mapping_2021_GDB/i15_Crop_Mapping_2021.gdb"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.exists</a></span><span class="op">(</span><span class="va">dwr_cropmapping_gdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_layers.html">st_layers</a></span><span class="op">(</span><span class="va">dwr_cropmapping_gdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Driver: OpenFileGDB 
+Available layers:
+             layer_name             geometry_type features fields crs_name
+1 i15_Crop_Mapping_2021 3D Measured Multi Polygon   431145     56    NAD83</code></pre>
+</div>
+</div>
+<p><br></p>
+</section><section id="exploring-the-statewide-crop-distribution-layer" class="level2"><h2 class="anchored" data-anchor-id="exploring-the-statewide-crop-distribution-layer">Exploring the Statewide Crop Distribution Layer</h2>
+<p>The best way to explore the Statewide Crop Distribution Layer is to open it up in ArcGIS Pro. The zip file from DWR contains both a geodatabase as well as an ArcGIS Pro layer file (<code>CropMapping2021_Legend.lyrx</code>). Double-click the layer file to open it up in ArcGIS Pro. You will probably need to reestablish the link to the data (layer properties &gt; source), but then you’re good to go.</p>
+<p>A good way to learn about a dataset is to read the metadata. The geodatabase appears to be the only source for the layer’s ‘metadata’. In other words, there is no sign of metadata on the DWR website or open data hub<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>However even the ‘metadata’ does not provide a field-by-field description, but you can make educated guesses by looking at the field properties and <a href="https://pro.arcgis.com/en/pro-app/latest/help/data/geodatabases/overview/an-overview-of-attribute-domains.htm">domains</a> that are saved in the geodatabase (see below).</p>
+<p><br></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Exploring the Data in ArcGIS Pro">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exploring the Data in ArcGIS Pro
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Reading the metadata and exploring the data more thoroughly in ArcGIS Pro is an extremely good idea if you’ll be using these data for research. In addition to the <code>MAIN_CROP</code> field (which is all we’re using in this notebook), there are 56 other fields that contain useful information including multi-cropping characteristics, crop category (as opposed to crop type), year the crop was established (i.e., for perennial crops), whether the classification was updated / revised by DWR, notes from the analyst, etc.</p>
+</div>
+</div>
+<p><br></p>
+</section><section id="which-attribute-field-contains-the-crop" class="level2"><h2 class="anchored" data-anchor-id="which-attribute-field-contains-the-crop">Which attribute field contains the ‘crop’?</h2>
+<p>The attribute table for the Statewide Crop Mapping layer has <strong>57 fields</strong>. Determining which field has the “crop” name requires some sleuthing, as there are several candidates whose name suggest it might be the crop name. DWR unfortunately does not publish a data dictionary for the data, but if you open the geodatabase in ArcGIS Pro you can see i) the ‘domains’ (list of codes and their descriptions used in several fields), and ii) <a href="https://ucanr-igis.github.io/sketchbook/i15_Crop_Mapping_2021_metdata.htm">descriptive metadata</a> that contains clues about the methodology.</p>
+<p>The code below only imports <strong>5</strong> of the 57 fields. The field we will use below as “the crop” is <strong><code>MAIN_CROP</code></strong>, which the metadata describes as:</p>
+<div style="margin-left; padding-left:1em; font-style:italic;">
+<p>A new column for the 2019, 2020, and 2021 datasets is called ‘MAIN_CROP’. This column indicates which field Land IQ identified as the main season crop for the WY representing the crop grown during the dominant growing season for each county.</p>
+</div>
+<p><br></p>
+</section><section id="figuring-out-the-codes" class="level2"><h2 class="anchored" data-anchor-id="figuring-out-the-codes">Figuring out the codes</h2>
+<p>Many of the attribute fields in the crop distribution layer contain codes or abbreviations. The descriptions that go with these codes are not documented anywhere online, unfortunately. However if you open the geodatabase in ArcGIS Pro, you can view the ‘domains’ (which is what ESRI calls code lists). For convenience, the domains have been also exported as tables saved in another geodatabase: <code>Crop_Mapping_2021_domains.gdb</code> (<a href="Crop_Mapping_2021_domains.gdb.zip">zip</a>).</p>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">domains_gdb</span> <span class="op">&lt;-</span> <span class="st">"Crop_Mapping_2021_domains.gdb"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.exists</a></span><span class="op">(</span><span class="va">domains_gdb</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_layers.html">st_layers</a></span><span class="op">(</span><span class="va">domains_gdb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE
+Driver: OpenFileGDB 
+Available layers:
+         layer_name geometry_type features fields crs_name
+1     allClas_dom_5            NA       27      2     &lt;NA&gt;
+2 allCropType_dom_3            NA       59      2     &lt;NA&gt;
+3  AllIrrigTypA_dom            NA        3      2     &lt;NA&gt;
+4  AllIrrigTypB_dom            NA       17      2     &lt;NA&gt;
+5   AllMultiUse_dom            NA        6      2     &lt;NA&gt;
+6      allNotes_dom            NA      129      2     &lt;NA&gt;
+7       AllPCNT_dom            NA      101      2     &lt;NA&gt;
+8 allSpecCond_dom_2            NA       20      2     &lt;NA&gt;
+9 allSubclass_dom_1            NA       33      2     &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p><br></p>
+<p>All 9 of these ‘domains’ are code lists used in one or more of the 57 fields in the attribute table.</p>
+<p><br></p>
+</section><section id="import-the-crop-type-codes" class="level2"><h2 class="anchored" data-anchor-id="import-the-crop-type-codes">Import the Crop Type codes</h2>
+<p>Let’s import the “crop types” domain, which we’re gonna need to interpret the <code>MAIN_CROP</code> field:</p>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">croptypes_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html">st_read</a></span><span class="op">(</span><span class="va">domains_gdb</span>, </span>
+<span>                         layer <span class="op">=</span> <span class="st">"allCropType_dom_3"</span>, </span>
+<span>                         as_tibble <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>code <span class="op">=</span> <span class="va">Code</span>, description <span class="op">=</span> <span class="va">Description</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="va">croptypes_tbl</span>, format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">code</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">****</td>
+<td style="text-align: left;">****</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Citrus and Subtropical - No Subclass</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C4</td>
+<td style="text-align: left;">Dates</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C5</td>
+<td style="text-align: left;">Avocados</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C6</td>
+<td style="text-align: left;">Olives</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C7</td>
+<td style="text-align: left;">Subtropical Fruits Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C8</td>
+<td style="text-align: left;">Kiwis</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C10</td>
+<td style="text-align: left;">Eucalyptus</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D1</td>
+<td style="text-align: left;">Apples</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D2</td>
+<td style="text-align: left;">Apricots</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D3</td>
+<td style="text-align: left;">Cherries Cherries</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D5</td>
+<td style="text-align: left;">Peaches and Nectarines</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D6</td>
+<td style="text-align: left;">Pears</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D7</td>
+<td style="text-align: left;">Plums</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D8</td>
+<td style="text-align: left;">Prunes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D10</td>
+<td style="text-align: left;">Deciduous - Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D12</td>
+<td style="text-align: left;">Almonds</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D13</td>
+<td style="text-align: left;">Walnuts</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D14</td>
+<td style="text-align: left;">Pistachios</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D15</td>
+<td style="text-align: left;">Pomegranates</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D17</td>
+<td style="text-align: left;">Pecans</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F1</td>
+<td style="text-align: left;">Cotton</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F2</td>
+<td style="text-align: left;">Safflower</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F5</td>
+<td style="text-align: left;">Sugar beets</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F10</td>
+<td style="text-align: left;">Beans (dry)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F11</td>
+<td style="text-align: left;">Field Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F12</td>
+<td style="text-align: left;">Sunflowers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F16</td>
+<td style="text-align: left;">Corn, Sorghum or Sudan (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">G2</td>
+<td style="text-align: left;">Wheat</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">G6</td>
+<td style="text-align: left;">Grain and Hay - Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I1</td>
+<td style="text-align: left;">Idle - Land not cropped in current or prior year, but within last 3 yrs.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I4</td>
+<td style="text-align: left;">Idle - Long Term - land consistently idle for four or more years</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">Alfalfa and alfalfa mixtures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;">Pasture - Mixed</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P4</td>
+<td style="text-align: left;">Pasture - Native Improved</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P5</td>
+<td style="text-align: left;">Pasture - Induced High Water</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P6</td>
+<td style="text-align: left;">Pasture - Miscellaneous Grasses</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P7</td>
+<td style="text-align: left;">Pasture - Turf Farms</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">R1</td>
+<td style="text-align: left;">Rice</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">R2</td>
+<td style="text-align: left;">Rice - Wild</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T4</td>
+<td style="text-align: left;">Cole crops (mixture of T22-T25)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T6</td>
+<td style="text-align: left;">Carrots</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T9</td>
+<td style="text-align: left;">Melons, Squash, and Cucumbers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T10</td>
+<td style="text-align: left;">Onions and Garlic</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T12</td>
+<td style="text-align: left;">Potatoes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T13</td>
+<td style="text-align: left;">Sweet Potatoes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T16</td>
+<td style="text-align: left;">Flowers, nursery and Christmas Tree Farms</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T18</td>
+<td style="text-align: left;">Truck Crops - Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T19</td>
+<td style="text-align: left;">Bushberries</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T20</td>
+<td style="text-align: left;">Strawberries</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T21</td>
+<td style="text-align: left;">Peppers (Chili, Bell, etc.)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T27</td>
+<td style="text-align: left;">Greenhouse</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T30</td>
+<td style="text-align: left;">Lettuce or Leafy Greens (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T32</td>
+<td style="text-align: left;">Tomatoes (all)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">U</td>
+<td style="text-align: left;">Urban - Unspecified Residential, Commercial, Industrial</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">UL2</td>
+<td style="text-align: left;">Urban Landscape - Golf Course Irrigated</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">V</td>
+<td style="text-align: left;">Vineyards - No Subclass</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">X</td>
+<td style="text-align: left;">Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">YP</td>
+<td style="text-align: left;">Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+</section><section id="import-the-statewide-crop-mapping-layer-for-just-the-aoi" class="level2"><h2 class="anchored" data-anchor-id="import-the-statewide-crop-mapping-layer-for-just-the-aoi">Import the Statewide Crop Mapping layer for Just the AOI</h2>
+<p>Next, we’ll import the crop distribution polygons using <code><a href="https://r-spatial.github.io/sf/reference/st_read.html">sf::st_read()</a></code>. We could import it all, but to save time (and memory) we’ll only import polygons that intersect our AOI.</p>
+<p>To add a spatial filter when we import the data, we need to define the bounding box and express it as WKT<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> (i.e., a character object). Note that we also have to transform the bounding box to geographic coordinates from the NAD83 datum, because that’s the CRS of the crop distribution layer.</p>
+<div class="cell">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">impval_gndwtr_nad83_sf</span> <span class="op">&lt;-</span> <span class="va">impval_gndwtr_sf</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span><span class="va">epsg_geo_nad83</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bbox_wkt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html">st_bbox</a></span><span class="op">(</span><span class="va">impval_gndwtr_nad83_sf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html">st_as_sfc</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_text.html">st_as_text</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bbox_wkt</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "POLYGON ((-115.8418 32.63896, -114.8255 32.63896, -114.8255 33.32349, -115.8418 33.32349, -115.8418 32.63896))"</code></pre>
+</div>
+</div>
+<p><br></p>
+<p>Now we can import the crop distribution layer for the bounding box. While we’re at it, we’ll also project it to UTM (because soon we’ll be computing areas), and join it to the full names of the crop types.</p>
+<div class="cell">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">crpdst_bbox_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html">st_read</a></span><span class="op">(</span>dsn <span class="op">=</span> <span class="va">dwr_cropmapping_gdb</span>,</span>
+<span>                        layer <span class="op">=</span> <span class="st">"i15_Crop_Mapping_2021"</span>,</span>
+<span>                        wkt_filter <span class="op">=</span> <span class="va">bbox_wkt</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span><span class="va">epsg_utm11n_wgs84</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>main_crop <span class="op">=</span> <span class="va">MAIN_CROP</span>, class2 <span class="op">=</span> <span class="va">CLASS2</span>, yr_planted <span class="op">=</span> <span class="va">YR_PLANTED</span>, </span>
+<span>         data_status <span class="op">=</span> <span class="va">DataStatus</span>, multiuse <span class="op">=</span> <span class="va">MULTIUSE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">croptypes_tbl</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"main_crop"</span> <span class="op">=</span> <span class="st">"code"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `i15_Crop_Mapping_2021' from data source 
+  `D:\GitHub\tech_notes\tech_notes\docs\i15_Crop_Mapping_2021_GDB\i15_Crop_Mapping_2021.gdb' 
+  using driver `OpenFileGDB'
+Simple feature collection with 7291 features and 56 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XYZ
+Bounding box:  xmin: -115.8481 ymin: 32.65474 xmax: -115.0058 ymax: 33.32963
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  NAD83</code></pre>
+</div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">crpdst_bbox_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["main_crop"],"name":[1],"type":["chr"],"align":["left"]},{"label":["class2"],"name":[2],"type":["chr"],"align":["left"]},{"label":["yr_planted"],"name":[3],"type":["int"],"align":["right"]},{"label":["data_status"],"name":[4],"type":["chr"],"align":["left"]},{"label":["multiuse"],"name":[5],"type":["chr"],"align":["left"]},{"label":["description"],"name":[6],"type":["chr"],"align":["left"]},{"label":["Shape"],"name":[7],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"T30","2":"T","3":"NA","4":"Final","5":"S","6":"Lettuce or Leafy Greens (grouped for remote sensing classification only)","7":"<s_MULTIP>","_rn_":"1"},{"1":"P6","2":"P","3":"NA","4":"Final","5":"S","6":"Pasture - Miscellaneous Grasses","7":"<s_MULTIP>","_rn_":"2"},{"1":"I4","2":"I","3":"NA","4":"Final","5":"S","6":"Idle - Long Term - land consistently idle for four or more years","7":"<s_MULTIP>","_rn_":"3"},{"1":"P1","2":"P","3":"NA","4":"Final","5":"S","6":"Alfalfa and alfalfa mixtures","7":"<s_MULTIP>","_rn_":"4"},{"1":"I1","2":"I","3":"NA","4":"Final","5":"S","6":"Idle - Land not cropped in current or prior year, but within last 3 yrs.","7":"<s_MULTIP>","_rn_":"5"},{"1":"P1","2":"P","3":"NA","4":"Final","5":"S","6":"Alfalfa and alfalfa mixtures","7":"<s_MULTIP>","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>Next, we project the AOI to UTM and compute the total area (which we’ll need below):</p>
+<div class="cell">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">impval_gndwtr_utm_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span><span class="va">impval_gndwtr_sf</span>, <span class="va">epsg_utm11n_wgs84</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">aoi_m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html">st_area</a></span><span class="op">(</span><span class="va">impval_gndwtr_utm_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<p>Next, we can overlay the AOI and the cropped crop layer:</p>
+<div class="cell">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">crpdst_bbox_sf</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">main_crop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">impval_gndwtr_utm_sf</span>,</span>
+<span>          colour <span class="op">=</span> <span class="st">"red"</span>, </span>
+<span>          fill <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>          lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_crs</a></span><span class="op">(</span><span class="va">epsg_utm11n_wgs84</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Crops within the Imperial Valley Groundwater Basin"</span>,</span>
+<span>       subtitle <span class="op">=</span> <span class="st">"2021"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="cropdist-dwr-local-stats_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>Display a “legend”:</p>
+<div class="cell">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">crops_in_this_area</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">crpdst_bbox_sf</span><span class="op">$</span><span class="va">main_crop</span><span class="op">)</span></span>
+<span><span class="va">croptypes_tbl</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">code</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">crops_in_this_area</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format<span class="op">=</span><span class="st">"html"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">code</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">****</td>
+<td style="text-align: left;">****</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Citrus and Subtropical - No Subclass</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C4</td>
+<td style="text-align: left;">Dates</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C6</td>
+<td style="text-align: left;">Olives</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C7</td>
+<td style="text-align: left;">Subtropical Fruits Misc.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">D10</td>
+<td style="text-align: left;">Deciduous - Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F1</td>
+<td style="text-align: left;">Cotton</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F5</td>
+<td style="text-align: left;">Sugar beets</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F10</td>
+<td style="text-align: left;">Beans (dry)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F11</td>
+<td style="text-align: left;">Field Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F16</td>
+<td style="text-align: left;">Corn, Sorghum or Sudan (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">G2</td>
+<td style="text-align: left;">Wheat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">G6</td>
+<td style="text-align: left;">Grain and Hay - Misc.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I1</td>
+<td style="text-align: left;">Idle - Land not cropped in current or prior year, but within last 3 yrs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I4</td>
+<td style="text-align: left;">Idle - Long Term - land consistently idle for four or more years</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">Alfalfa and alfalfa mixtures</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;">Pasture - Mixed</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P6</td>
+<td style="text-align: left;">Pasture - Miscellaneous Grasses</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T4</td>
+<td style="text-align: left;">Cole crops (mixture of T22-T25)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T6</td>
+<td style="text-align: left;">Carrots</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T9</td>
+<td style="text-align: left;">Melons, Squash, and Cucumbers</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T10</td>
+<td style="text-align: left;">Onions and Garlic</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T12</td>
+<td style="text-align: left;">Potatoes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T16</td>
+<td style="text-align: left;">Flowers, nursery and Christmas Tree Farms</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T18</td>
+<td style="text-align: left;">Truck Crops - Misc.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T27</td>
+<td style="text-align: left;">Greenhouse</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T30</td>
+<td style="text-align: left;">Lettuce or Leafy Greens (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T32</td>
+<td style="text-align: left;">Tomatoes (all)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">X</td>
+<td style="text-align: left;">Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">YP</td>
+<td style="text-align: left;">Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+</section><section id="intersect-the-crop-polygons-with-the-aoi" class="level2"><h2 class="anchored" data-anchor-id="intersect-the-crop-polygons-with-the-aoi">Intersect the Crop Polygons with the AOI</h2>
+<p>We are almost done, but we still have some polygons outside our non-rectangular AOI. To get only the polygons within the AOI, we have to take the intersection:</p>
+<div class="cell">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">crops_aoi_sf</span> <span class="op">&lt;-</span> <span class="va">crpdst_bbox_sf</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html">st_intersection</a></span><span class="op">(</span><span class="va">impval_gndwtr_utm_sf</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>area_m2 <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_measures.html">st_area</a></span><span class="op">(</span><span class="va">Shape</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html">relocate</a></span><span class="op">(</span><span class="va">area_m2</span>, .before <span class="op">=</span> <span class="va">Shape</span><span class="op">)</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: attribute variables are assumed to be spatially constant throughout
+all geometries</code></pre>
+</div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">crops_aoi_sf</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["main_crop"],"name":[1],"type":["chr"],"align":["left"]},{"label":["class2"],"name":[2],"type":["chr"],"align":["left"]},{"label":["yr_planted"],"name":[3],"type":["int"],"align":["right"]},{"label":["data_status"],"name":[4],"type":["chr"],"align":["left"]},{"label":["multiuse"],"name":[5],"type":["chr"],"align":["left"]},{"label":["FID"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["basin_id"],"name":[7],"type":["chr"],"align":["left"]},{"label":["basin_subb"],"name":[8],"type":["chr"],"align":["left"]},{"label":["basin_su_1"],"name":[9],"type":["chr"],"align":["left"]},{"label":["basin_name"],"name":[10],"type":["chr"],"align":["left"]},{"label":["subbasin_n"],"name":[11],"type":["chr"],"align":["left"]},{"label":["region_off"],"name":[12],"type":["chr"],"align":["left"]},{"label":["color"],"name":[13],"type":["chr"],"align":["left"]},{"label":["area_m2"],"name":[14],"type":["units"],"align":["right"]},{"label":["Shape"],"name":[15],"type":["s_POLYGO"],"align":["right"]}],"data":[{"1":"T30","2":"T","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"326542.2 [m^2]","15":"<s_POLYGO>","_rn_":"1"},{"1":"P6","2":"P","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"305880.7 [m^2]","15":"<s_POLYGO>","_rn_":"2"},{"1":"P1","2":"P","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"294524.4 [m^2]","15":"<s_POLYGO>","_rn_":"4"},{"1":"I1","2":"I","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"117720.9 [m^2]","15":"<s_POLYGO>","_rn_":"5"},{"1":"P1","2":"P","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"291612.0 [m^2]","15":"<s_POLYGO>","_rn_":"6"},{"1":"P6","2":"P","3":"NA","4":"Final","5":"S","6":"134","7":"7-030","8":"7-030","9":"7-30","10":"IMPERIAL VALLEY","11":"","12":"SRO","13":"#71FF00","14":"225126.1 [m^2]","15":"<s_POLYGO>","_rn_":"7"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p><br></p>
+<p>Plot these with the AOI boundary:</p>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">crops_aoi_sf</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">main_crop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">impval_gndwtr_utm_sf</span>,</span>
+<span>          colour <span class="op">=</span> <span class="st">"red"</span>, </span>
+<span>          fill <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>          lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">coord_sf</a></span><span class="op">(</span>datum <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html">st_crs</a></span><span class="op">(</span><span class="va">epsg_utm11n_wgs84</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Crops within Imperial Valley Groundwater Basin"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="cropdist-dwr-local-stats_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This looks good!</p>
+<p><br></p>
+</section><section id="compute-the-total-area-for-each-crop" class="level2"><h2 class="anchored" data-anchor-id="compute-the-total-area-for-each-crop">Compute the Total Area for Each Crop</h2>
+<p>We can now compute the total area for each crop as well as percent of the AOI covered:</p>
+<div class="cell">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">crop_sumaoi_tbl</span> <span class="op">&lt;-</span> <span class="va">crops_aoi_sf</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">main_crop</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>crop_area_m2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">area_m2</span><span class="op">)</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>prcnt_aoi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">crop_area_m2</span> <span class="op">/</span> <span class="va">aoi_m2</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">croptypes_tbl</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"main_crop"</span> <span class="op">=</span> <span class="st">"code"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>crop <span class="op">=</span> <span class="va">main_crop</span>, description <span class="op">=</span> <span class="va">description</span>, <span class="va">crop_area_m2</span>, <span class="va">prcnt_aoi</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">prcnt_aoi</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="va">crop_sumaoi_tbl</span> <span class="op">|&gt;</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format<span class="op">=</span><span class="st">"html"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">crop</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">crop_area_m2</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">prcnt_aoi</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">Alfalfa and alfalfa mixtures</td>
+<td style="text-align: right;">577237615 [m^2]</td>
+<td style="text-align: right;">0.15</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P6</td>
+<td style="text-align: left;">Pasture - Miscellaneous Grasses</td>
+<td style="text-align: right;">354501432 [m^2]</td>
+<td style="text-align: right;">0.09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T30</td>
+<td style="text-align: left;">Lettuce or Leafy Greens (grouped for remote sensing classification only)</td>
+<td style="text-align: right;">145445534 [m^2]</td>
+<td style="text-align: right;">0.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F5</td>
+<td style="text-align: left;">Sugar beets</td>
+<td style="text-align: right;">101300822 [m^2]</td>
+<td style="text-align: right;">0.03</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">****</td>
+<td style="text-align: left;">****</td>
+<td style="text-align: right;">84757653 [m^2]</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T10</td>
+<td style="text-align: left;">Onions and Garlic</td>
+<td style="text-align: right;">58496668 [m^2]</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T4</td>
+<td style="text-align: left;">Cole crops (mixture of T22-T25)</td>
+<td style="text-align: right;">77299581 [m^2]</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F16</td>
+<td style="text-align: left;">Corn, Sorghum or Sudan (grouped for remote sensing classification only)</td>
+<td style="text-align: right;">54723225 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">G2</td>
+<td style="text-align: left;">Wheat</td>
+<td style="text-align: right;">37399621 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">G6</td>
+<td style="text-align: left;">Grain and Hay - Misc.</td>
+<td style="text-align: right;">27437013 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I1</td>
+<td style="text-align: left;">Idle - Land not cropped in current or prior year, but within last 3 yrs.</td>
+<td style="text-align: right;">20883141 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I4</td>
+<td style="text-align: left;">Idle - Long Term - land consistently idle for four or more years</td>
+<td style="text-align: right;">32687467 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T18</td>
+<td style="text-align: left;">Truck Crops - Misc.</td>
+<td style="text-align: right;">30757896 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T6</td>
+<td style="text-align: left;">Carrots</td>
+<td style="text-align: right;">46814724 [m^2]</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C</td>
+<td style="text-align: left;">Citrus and Subtropical - No Subclass</td>
+<td style="text-align: right;">11598121 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C4</td>
+<td style="text-align: left;">Dates</td>
+<td style="text-align: right;">2590187 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C6</td>
+<td style="text-align: left;">Olives</td>
+<td style="text-align: right;">1309333 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C7</td>
+<td style="text-align: left;">Subtropical Fruits Misc.</td>
+<td style="text-align: right;">607722 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">D10</td>
+<td style="text-align: left;">Deciduous - Misc.</td>
+<td style="text-align: right;">66086 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F1</td>
+<td style="text-align: left;">Cotton</td>
+<td style="text-align: right;">143078 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">F10</td>
+<td style="text-align: left;">Beans (dry)</td>
+<td style="text-align: right;">201272 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F11</td>
+<td style="text-align: left;">Field Misc.</td>
+<td style="text-align: right;">955085 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;">Pasture - Mixed</td>
+<td style="text-align: right;">692253 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T12</td>
+<td style="text-align: left;">Potatoes</td>
+<td style="text-align: right;">4864235 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T16</td>
+<td style="text-align: left;">Flowers, nursery and Christmas Tree Farms</td>
+<td style="text-align: right;">145414 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T27</td>
+<td style="text-align: left;">Greenhouse</td>
+<td style="text-align: right;">32406 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T9</td>
+<td style="text-align: left;">Melons, Squash, and Cucumbers</td>
+<td style="text-align: right;">12096649 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">X</td>
+<td style="text-align: left;">Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined</td>
+<td style="text-align: right;">18560407 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">YP</td>
+<td style="text-align: left;">Young Perennial (grouped for remote sensing or when CLASS C, D or V is not determined)</td>
+<td style="text-align: right;">25842 [m^2]</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+<p>Visualize the top-15 as a bar chart:</p>
+<div class="cell">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">crop_sumaoi_tbl</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice_max</a></span><span class="op">(</span>order_by <span class="op">=</span> <span class="va">crop_area_m2</span>, n <span class="op">=</span> <span class="fl">15</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>crop_area_ac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://r-quantities.github.io/units/reference/units.html">set_units</a></span><span class="op">(</span><span class="va">crop_area_m2</span>, <span class="va">acres</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">crop_area_ac</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span><span class="op">(</span><span class="va">crop</span>, <span class="va">crop_area_ac</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Crop Distribution in Imperial Valley Groundwater Basin"</span>,</span>
+<span>       subtitle <span class="op">=</span> <span class="st">"Top 15 Crops from 2021"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"acres"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"crop"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="cropdist-dwr-local-stats_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## Legend</span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html">desc</a></span><span class="op">(</span><span class="va">crop_area_ac</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">crop</span>, <span class="va">description</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span>format <span class="op">=</span> <span class="st">"html"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead><tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">crop</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">Alfalfa and alfalfa mixtures</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P6</td>
+<td style="text-align: left;">Pasture - Miscellaneous Grasses</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T30</td>
+<td style="text-align: left;">Lettuce or Leafy Greens (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F5</td>
+<td style="text-align: left;">Sugar beets</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">****</td>
+<td style="text-align: left;">****</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T4</td>
+<td style="text-align: left;">Cole crops (mixture of T22-T25)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T10</td>
+<td style="text-align: left;">Onions and Garlic</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">F16</td>
+<td style="text-align: left;">Corn, Sorghum or Sudan (grouped for remote sensing classification only)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T6</td>
+<td style="text-align: left;">Carrots</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">G2</td>
+<td style="text-align: left;">Wheat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I4</td>
+<td style="text-align: left;">Idle - Long Term - land consistently idle for four or more years</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T18</td>
+<td style="text-align: left;">Truck Crops - Misc.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">G6</td>
+<td style="text-align: left;">Grain and Hay - Misc.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I1</td>
+<td style="text-align: left;">Idle - Land not cropped in current or prior year, but within last 3 yrs.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">X</td>
+<td style="text-align: left;">Not cropped, or unclassified at the time of remote-sensing analysis. Idle status not determined</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><br></p>
+</section><section id="conclusion" class="level2"><h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The Statewide Crop Mapping layer from CA DWR is an important dataset with many uses in the agricultural sector. It is relatively easy to analyze in R, provided you know where to find the metadata and field values (i.e., domains). Once in R, you can easily compute crop statistics for any area-of-interest using powerful functions from <code>sf</code> and <code>dplyr</code>.</p>
+</section><div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+<ol>
+<li id="fn1"><p>The crop distribution layer is updated every year, but as of the date of this notebook 2021 was the most recent year that was labeled as “final”.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>For convenience, a copy of the metadata has been extracted from the geodatabase and shared <a href="https://ucanr-igis.github.io/sketchbook/i15_Crop_Mapping_2021_metdata.htm">here</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Well Known Text<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol></section></div></main><!-- /main column --><hr>
+<p style="font-size:90%; font-style:italic; text-align:center;">This work was supported by the USDA - National Institute of Food and Agriculture (Hatch Project 1015742; Powers).</p>
+
+<p style="margin-top:2em;"><img src="data:image/png;base64,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" style="width:550px; height:58px;"></p>
+<p>&nbsp;</p>
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

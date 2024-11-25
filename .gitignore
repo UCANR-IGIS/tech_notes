@@ -10,3 +10,6 @@ docs/recs_ctr_3857.geojson
 docs/webmap_prep_cache/*
 docs/download-census-geometries_cache/*
 docs/hide/*
+docs/statewide_cropdist_2021/Crop_Mapping_2021_domains.gdb/*
+docs/statewide_cropdist_2021/i15_Crop_Mapping_2021.gdb/*
+docs/statewide_cropdist_2021/*.lyrx
