@@ -1,5 +1,5 @@
 ---
-title: "Summarizing Crop Distribution for any Area of Interest in California"
+title: "How to Summarize Crop Distribution for any Area-of-Interest in California"
 author:
   - name: Andy Lyons
     orcid: 0000-0002-7505-6709
@@ -74,18 +74,19 @@ IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflo
 
 ## Summary 
 
-This Tech Note illustrates how to tabulate the distribution of crops for any area of interest in CA using R. For the crop layer, it uses the 2021^[The crop distribution layer is updated every year, but as of the date of this notebook 2021 was the most recent year that was labeled as "final".] [Statewide Crop Mapping Layer](https://data.cnra.ca.gov/dataset/statewide-crop-mapping) from [CA DWR](https://data.cnra.ca.gov/organization/dwr). For the area-of-interest, the example uses a groundwater basin, but the method will work with any polygon in CA.
+This Tech Note illustrates how to tabulate the distribution of crops for any area of interest in CA using R. For the crop layer, it uses the 2021^[The crop distribution layer is updated every year, but as of the date of this notebook 2021 was the most recent year that was labeled as "final".] [Statewide Crop Mapping Layer](https://data.cnra.ca.gov/dataset/statewide-crop-mapping) from [CA DWR](https://data.cnra.ca.gov/organization/dwr). For the area-of-interest, this example uses a groundwater basin for Imperial Valley, but the method will work with any polygon in CA.
 
 More specifically, this Tech Note shows how to:
 
 1. Import a polygon area-of-interest from a local GIS file
 1. Import the 2021 Statewide Crop Mapping Layer for the AOI using the downloaded geodatabase 
-1. Intersect the AOI with the crop polygons
-1. Compute for each the total areas of each crop, including the percent of the AOI
+1. Explore the Statewide Crop Mapping layer, including the metadata and field codes  
+1. Intersect the Statewide Crop Mapping layer with the AOI
+1. Compute the total area for each crop, including the percent of the AOI
 
 ## Setup
 
-To begin we load the packages we'll be using:
+To begin, load the packages we'll be using:
 
 ```{r message = FALSE}
 library(sf)
@@ -95,7 +96,7 @@ library(leaflet)
 library(units)
 ```
 
-Next, we define a few EPSG codes (i.e., projections) that we'll need later:
+Next, we define a few EPSG codes (used to define projections), that we'll need later:
 
 ```{r}
 epsg_geo_wgs84 <- 4326
@@ -105,9 +106,9 @@ epsg_utm11n_wgs84 <- 32611
 
 \
 
-## Import an Area of Interest
+## Import an Area-of-Interest
 
-Next, we import our area-of-interest from a GIS file. For this example, we will use the groundwater basin for Imperial Valley which has been saved as a geojson file ([source](https://ucanr-igis.github.io/sketchbook/groundwater-basins-import.html)). But the same basic technique would work with any polygon as long as it falls within California.
+Next, we import our area-of-interest from a GIS file. For this example, we will use the groundwater basin for Imperial Valley which has been saved as a geojson file ([code](https://ucanr-igis.github.io/sketchbook/groundwater-basins-import.html)). But the same basic technique would work with any simple feature polygon as long as it falls within California.
 
 ```{r}
 impval_gndwtr_sf <- st_read("imperial-valley-groundwater-basin-2016.geojson")
@@ -128,14 +129,14 @@ We are using a local copy of the crop distribution data because:
 
 1. accessing a local geodatabase will give us the fastest performance (compared to importing the data from the CNRA ArcGIS Server, although that can also be done).
 2. the size of the data is manageable (the zip file is 90 MB, and unzipped is 207 MB).
-3. the links to the online layers (i.e., Map Service) seem to be broken (or require a login), so there is not much alternative.
+3. the links to the online layers (i.e., Map Service) seem to be broken (or require a login), so we don't have much alternative.
 
 \
 
 Step 1 is to view the layers in the geodatabase:
 
 ```{r}
-dwr_cropmapping_gdb <- "i15_Crop_Mapping_2021_GDB/i15_Crop_Mapping_2021.gdb"
+dwr_cropmapping_gdb <- "./statewide_cropdist_2021/i15_Crop_Mapping_2021.gdb"
 dir.exists(dwr_cropmapping_gdb)
 st_layers(dwr_cropmapping_gdb)
 ```
@@ -144,7 +145,7 @@ st_layers(dwr_cropmapping_gdb)
 
 ## Exploring the Statewide Crop Distribution Layer
 
-The best way to explore the Statewide Crop Distribution Layer is to open it up in ArcGIS Pro. The zip file from DWR contains both a geodatabase as well as an ArcGIS Pro layer file (`CropMapping2021_Legend.lyrx`). Double-click the layer file to open it up in ArcGIS Pro. You will probably need to reestablish the link to the data (layer properties > source), but then you're good to go.
+The best way to explore the Statewide Crop Distribution Layer is to open it up in ArcGIS Pro. The zip file from DWR contains both a geodatabase as well as an ArcGIS Pro layer file (`CropMapping2021_Legend.lyrx`). Double-click the layer file to open it up in ArcGIS Pro. You will probably need to reestablish the link to the data (layer properties > source), but after that you should be you're good to go.
 
 A good way to learn about a dataset is to read the metadata. The geodatabase appears to be the only source for the layer's 'metadata'. In other words, there is no sign of metadata on the DWR website or open data hub^[For convenience, a copy of the metadata has been extracted from the geodatabase and shared [here](https://ucanr-igis.github.io/sketchbook/i15_Crop_Mapping_2021_metdata.htm)]. 
 
@@ -160,7 +161,7 @@ Reading the metadata and exploring the data more thoroughly in ArcGIS Pro is an 
 
 ## Which attribute field contains the 'crop'?
 
-The attribute table for the Statewide Crop Mapping layer has **57 fields**. Determining which field has the "crop" name requires some sleuthing, as there are several candidates whose name suggest it might be the crop name. DWR unfortunately does not publish a data dictionary for the data, but if you open the geodatabase in ArcGIS Pro you can see i) the 'domains' (list of codes and their descriptions used in several fields), and ii) [descriptive metadata](https://ucanr-igis.github.io/sketchbook/i15_Crop_Mapping_2021_metdata.htm) that contains clues about the methodology.
+The attribute table for the Statewide Crop Mapping layer has **57 fields** &#128558;. Determining which field has the "crop" name requires some sleuthing, as there are several candidates whose name suggest it might be the crop name. DWR unfortunately does not publish a data dictionary for the data, but if you open the geodatabase in ArcGIS Pro you can see i) the 'domains' (list of codes and their descriptions used in several fields), and ii) [descriptive metadata](https://ucanr-igis.github.io/sketchbook/i15_Crop_Mapping_2021_metdata.htm) that contains clues about the methodology.
 
 The code below only imports **5** of the 57 fields. The field we will use below as "the crop" is **`MAIN_CROP`**, which the metadata describes as:
 
@@ -172,12 +173,12 @@ A new column for the 2019, 2020, and 2021 datasets is called ‘MAIN_CROP’. Th
 \
 
 
-## Figuring out the codes
+## Figuring out the Codes
 
 Many of the attribute fields in the crop distribution layer contain codes or abbreviations. The descriptions that go with these codes are not documented anywhere online, unfortunately. However if you open the geodatabase in ArcGIS Pro, you can view the 'domains' (which is what ESRI calls code lists). For convenience, the domains have been also exported as tables saved in another geodatabase: `Crop_Mapping_2021_domains.gdb` ([zip](Crop_Mapping_2021_domains.gdb.zip)).
 
 ```{r results='hold'}
-domains_gdb <- "Crop_Mapping_2021_domains.gdb"
+domains_gdb <- "./statewide_cropdist_2021/Crop_Mapping_2021_domains.gdb"
 dir.exists(domains_gdb)
 st_layers(domains_gdb)
 ```
@@ -188,7 +189,7 @@ All 9 of these 'domains' are code lists used in one or more of the 57 fields in 
 
 \
 
-## Import the Crop Type codes
+## Import the Crop Type Descriptions
 
 Let's import the "crop types" domain, which we're gonna need to interpret the `MAIN_CROP` field:
 
@@ -204,7 +205,7 @@ knitr::kable(croptypes_tbl, format = "html")
 
 \
 
-## Import the Statewide Crop Mapping layer for Just the AOI
+## Import the Statewide Crop Mapping layer for just the AOI
 
 Next, we'll import the crop distribution polygons using `sf::st_read()`. We could import it all, but to save time (and memory) we'll only import polygons that intersect our AOI.
 
