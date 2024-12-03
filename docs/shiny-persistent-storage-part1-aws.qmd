@@ -1,6 +1,13 @@
 ---
-title: "Using Cloud Services for Persistent Storage for Shiny Apps"
-subtitle: "Part 1: AWS S3"
+title: "Using Cloud Services for Persistent Storage for Shiny Apps Part 1: AWS S3"
+author:
+  - name: Andy Lyons
+    orcid: 0000-0002-7505-6709
+    affiliations:
+      - name: UC Agriculture and Natural Resources
+        department: Informatics and GIS
+        url: https://igis.ucanr.edu/
+date: "April 17, 2024"
 format:
   html:
     theme: cosmo

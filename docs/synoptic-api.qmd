@@ -4,7 +4,7 @@ author:
   - name: Andy Lyons
     orcid: 0000-0002-7505-6709
     affiliations:
-      - name: UC Agriculture and Natural Resources
+      - name: UC Division of Agriculture and Natural Resources
         department: Informatics and GIS
         url: https://igis.ucanr.edu/
 date: "January 31, 2024"
