@@ -92,9 +92,9 @@ Setting up an older version of R requires a few tricks, but is definitely doable
 
 Similarly, older versions of R packages are available on CRAN and other repositories. There are also special packages like [`groundhog`](https://groundhogr.com/) which are designed specifically to help you find and install older packages. 
 
-## Example: Installing tlocoh
+## Example: Installing `tlocoh`
 
-[`tlocoh`](https://tlocoh.r-forge.r-project.org/) is a brilliant package to analyze spatiotemporal patterns in animal movement. Unfortunately, the last real update to tlocoh was in 2013, and since then several of its dependent packages have been retired, including `rgdal`, `rgeos`, and `gcplib`. To make matters worse, some of the dependencies are no longer compatible with the most recent version R, meaning we'll have to install an older version of R as well.
+[`tlocoh`](https://tlocoh.r-forge.r-project.org/) ([Lyons et al, 2013](http://www.movementecologyjournal.com/content/1/1/2)) is a brilliant package to analyze spatiotemporal patterns in animal movement. Unfortunately, the last real update to tlocoh was in 2013, and since then several of its dependent packages have been retired, including `rgdal`, `rgeos`, and `gcplib`. To make matters worse, some of the dependencies are no longer compatible with the most recent version R, meaning we'll have to install an older version of R as well.
 
 ::: {.callout-note title="Workflow Overview"}
 
