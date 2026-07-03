@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andy Lyons">
+<meta name="dcterms.date" content="2026-07-01">
+
+<title>Installing R Packages with Broken Dependencies</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="installing_legacy_rpackages_files/libs/clipboard/clipboard.min.js"></script>
+<script src="installing_legacy_rpackages_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="installing_legacy_rpackages_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="installing_legacy_rpackages_files/libs/quarto-html/popper.min.js"></script>
+<script src="installing_legacy_rpackages_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="installing_legacy_rpackages_files/libs/quarto-html/anchor.min.js"></script>
+<link href="installing_legacy_rpackages_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="installing_legacy_rpackages_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="installing_legacy_rpackages_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="installing_legacy_rpackages_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="installing_legacy_rpackages_files/libs/bootstrap/bootstrap-bfeeef7994d245473bbfc7c7cddd390b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-WFBV8LKRHQ"></script>
+
+<script>
+
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag(){dataLayer.push(arguments);}
+
+  gtag('js', new Date());
+
+
+
+  gtag('config', 'G-WFBV8LKRHQ');
+
+</script>
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#summary" id="toc-summary" class="nav-link active" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a>
+  <ul class="collapse">
+  <li><a href="#going-back-in-time" id="toc-going-back-in-time" class="nav-link" data-scroll-target="#going-back-in-time">Going back in time</a></li>
+  </ul></li>
+  <li><a href="#example-installing-tlocoh" id="toc-example-installing-tlocoh" class="nav-link" data-scroll-target="#example-installing-tlocoh">Example: Installing tlocoh</a>
+  <ul class="collapse">
+  <li><a href="#step-1.-when-did-it-last-work" id="toc-step-1.-when-did-it-last-work" class="nav-link" data-scroll-target="#step-1.-when-did-it-last-work">Step 1. When did it last work?</a></li>
+  <li><a href="#step-2.-install-an-older-version-of-r-if-needed" id="toc-step-2.-install-an-older-version-of-r-if-needed" class="nav-link" data-scroll-target="#step-2.-install-an-older-version-of-r-if-needed">Step 2. Install an older version of R (if needed)</a></li>
+  <li><a href="#step-3.-install-rtools" id="toc-step-3.-install-rtools" class="nav-link" data-scroll-target="#step-3.-install-rtools">Step 3. Install RTools</a></li>
+  <li><a href="#step-4.-launch-the-earlier-version-of-r" id="toc-step-4.-launch-the-earlier-version-of-r" class="nav-link" data-scroll-target="#step-4.-launch-the-earlier-version-of-r">Step 4. Launch the earlier version of R</a></li>
+  <li><a href="#step-5.-identify-tlocohs-dependencies" id="toc-step-5.-identify-tlocohs-dependencies" class="nav-link" data-scroll-target="#step-5.-identify-tlocohs-dependencies">Step 5. Identify <code>tlocoh's</code> dependencies</a></li>
+  <li><a href="#step-6.-install-tlocohs-dependencies-with-groundhog" id="toc-step-6.-install-tlocohs-dependencies-with-groundhog" class="nav-link" data-scroll-target="#step-6.-install-tlocohs-dependencies-with-groundhog">Step 6. Install <code>tlocoh's</code> dependencies with <code>groundhog</code></a></li>
+  <li><a href="#step-7.-install-tlocoh" id="toc-step-7.-install-tlocoh" class="nav-link" data-scroll-target="#step-7.-install-tlocoh">Step 7. Install <code>tlocoh</code></a></li>
+  <li><a href="#step-8.-run-a-test-script" id="toc-step-8.-run-a-test-script" class="nav-link" data-scroll-target="#step-8.-run-a-test-script">Step 8. Run a test script</a></li>
+  </ul></li>
+  <li><a href="#analyzing-tlocohs-outputs-in-the-current-version-of-r" id="toc-analyzing-tlocohs-outputs-in-the-current-version-of-r" class="nav-link" data-scroll-target="#analyzing-tlocohs-outputs-in-the-current-version-of-r">Analyzing <code>tlocoh's</code> Outputs in the Current Version of R</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+<div style="background-color:#1C2C53; color:white; padding:8px;">
+
+<a href="https://ucanr.edu/program/informatics-and-gis-program">
+
+<img src="images/igis-logo_bg-trans_white_250x74.png" style="width:250px; height:74px; margin:4px;">
+
+</a>
+
+</div>
+
+
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Installing R Packages with Broken Dependencies</h1>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Andy Lyons <a href="https://orcid.org/0000-0002-7505-6709" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            <a href="https://igis.ucanr.edu/">
+            UC Agriculture and Natural Resources
+            </a>
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 1, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<style type="text/css">
+h1.title {
+  font-family: Muli, "Open Sans", sans-serif;
+  font-weight:600; 
+  font-size:2.5rem; 
+  border-top-color: rgb(237, 169, 31);
+  border-top-width: 5px;
+  border-top-style: solid;
+  margin-top:0.5em;
+  line-height:1.5;
+  
+}
+p.subtitle {
+  font-family: Muli, "Open Sans", sans-serif;
+  font-size:2rem;
+  font-weight:500; 
+}
+h2 {
+  font-size:2rem;
+  font-weight:500; 
+  font-family:Muli,"Open Sans",sans-serif;
+}
+h3 {font-size:1.5rem; font-weight:500;}
+h4.date,h4.author {font-size:100%;}
+div.protip {padding:0.5em; background-color:#ddd; border:2px solid gray; margin:0 3em;}
+
+div.about-technotes {
+  font-style:italic; 
+  font-size:90%; 
+  margin:2em;
+}
+div.author {
+  font-size:90%; 
+}
+img.screenshot, div.json-chunk {
+  border:1px solid gray;
+}
+</style>
+</div>
+<hr>
+<div class="about-technotes">
+<p>IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflows and techniques for using geospatial science and technologies in research and extension. They are works in progress, and we welcome feedback and comments.</p>
+</div>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p><a href="https://cran.r-project.org/package=rgdal"><code>rgdal</code></a> and <a href="https://cran.r-project.org/package=rgeos"><code>rgeos</code></a> were the backbone of spatial data operations in R for over a decade. Unfortunately they eventually became out of date as their primary maintainer approached retirement, and were eventually replaced by the more modern <a href="https://r-spatial.github.io/sf/"><code>sf</code></a> package. In 2023 they were archived on CRAN and could no longer be installed through the normal channels.</p>
+<p>Many packages that used <code>rgdal</code> and <code>rgeos</code> were updated to the <code>sf</code> package, but not all (e.g., <a href="https://tlocoh.r-forge.r-project.org/"><code>tlocoh</code></a>). This creates a challenge for current users because you can’t install a package if the required dependencies are not available. This Tech Note describes a work-around to install older packages that are still dependent on <code>rgdal</code> and <code>rgeos</code>.</p>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<p>One of the strengths of the R ecosystem is the ability of packages to draw upon functions from other packages. This allows package developers to focus on their package’s main purpose, without having to recreate everything from scratch.</p>
+<p>This system of dependencies however can cause problems when a dependent package becomes unavailable on CRAN. Packages can get archived on CRAN for any number of reasons, including a request from the maintainer to retire the package. Even if the package is still available from other repositories or on GitHub, the normal <code>install.packages()</code> function may no longer work. If enough time goes by, the older package may even become incompatible with the current release of R.</p>
+<section id="going-back-in-time" class="level3">
+<h3 class="anchored" data-anchor-id="going-back-in-time">Going back in time</h3>
+<p>The very best option for packages that have broken dependencies is for the maintainer to update the package to use newer or alternative dependencies that are actively maintained. Unfortunately this is not always possible.</p>
+<p>The next best strategy is to essentially create an <strong>R time machine</strong>. In other words, install an older instance of R, complete with versions of all the dependencies before they became archived, and do your work there.</p>
+<p>Setting up an older version of R requires a few tricks, but is definitely doable. You may or may not have to install an older release of base R, but if you do they are readily available on CRAN. You won’t have to uninstall your current version of R either, because R is perfectly happy having multiple versions of itself living side-by-side on your laptop. Modern IDEs like RStudio are also happy with multiple versions of R installed. You just select the version you want from the options menu, and you’re transported back in time.</p>
+<p>Similarly, older versions of R packages are available on CRAN and other repositories. There are also special packages like <a href="https://groundhogr.com/"><code>groundhog</code></a> which are designed specifically to help you find and install older packages.</p>
+</section>
+</section>
+<section id="example-installing-tlocoh" class="level2">
+<h2 class="anchored" data-anchor-id="example-installing-tlocoh">Example: Installing tlocoh</h2>
+<p><a href="https://tlocoh.r-forge.r-project.org/"><code>tlocoh</code></a> is a brilliant package to analyze spatiotemporal patterns in animal movement. Unfortunately, the last real update to tlocoh was in 2013, and since then several of its dependent packages have been retired, including <code>rgdal</code>, <code>rgeos</code>, and <code>gcplib</code>. To make matters worse, some of the dependencies are no longer compatible with the most recent version R, meaning we’ll have to install an older version of R as well.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Workflow Overview">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Workflow Overview
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Identify a date when everything was working<br>
+</li>
+<li>Install an older version of base R (if needed)<br>
+</li>
+<li>Install RTools (if needed, but common)<br>
+</li>
+<li>Identify required dependencies<br>
+</li>
+<li>Install historical versions of the dependencies<br>
+</li>
+<li>Install the package you want to use<br>
+</li>
+<li>Do your work</li>
+<li>Save outputs to disk in standard formats so you can continue to work with them in the current version of R and other software,</li>
+</ol>
+</div>
+</div>
+<section id="step-1.-when-did-it-last-work" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.-when-did-it-last-work">Step 1. When did it last work?</h3>
+<p>The first step is to identify a date when the package worked. For this example, we’ll go back to January 1, 2020, which is well before <code>rgdal</code> and <code>rgeos</code> were archived.</p>
+</section>
+<section id="step-2.-install-an-older-version-of-r-if-needed" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.-install-an-older-version-of-r-if-needed">Step 2. Install an older version of R (if needed)</h3>
+<div class="callout callout-style-default callout-note callout-titled" title="Do I really need an older version of R?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Do I really need an older version of R?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You may or may not need an older version of R to use your broken package. It depends on how old the package you are trying to use is, and why it and/or its dependencies are no longer available on CRAN.</p>
+<p>Some packages get archived on CRAN because CRAN administrators cannot contact the maintainer, or the package doesn’t meet a new standard from CRAN. It may still work fine with the current release of R, provided you can find it on GitHub or some other source.</p>
+<p>That being said, there are definitely some packages that get broken with updates to base R. If the package you are trying to revive, or one of its dependencies, falls in this category, then you need to install an older version of R.</p>
+<p>To determine whether your package or any of its dependencies are incompatible with the current release of R, you can ask a search engine or GenAI tool which will point you to documentation and announcements.</p>
+</div>
+</div>
+<p>To make sure we have a compatible version of R, we’ll install a release that was active when everything was working. Looking at CRAN’s list of <a href="https://cran.r-project.org/bin/windows/base/old/">Previous Releases of R</a>, we see that that R 3.6.3 was published in February 2020. So we’ll go with that. You can download older versions of R from <a href="https://cran.r-project.org/bin/windows/base/old/" class="uri">https://cran.r-project.org/bin/windows/base/old/</a>.</p>
+</section>
+<section id="step-3.-install-rtools" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.-install-rtools">Step 3. Install RTools</h3>
+<p>RTools is a separate set of utilities to install packages that need to be compiled from source. Not many packages need compilation these days, but older packages are often only available as source. Compilation may also be required if the package uses libraries from C++ or other languages (<a href="https://groundhogr.com/help-with-r-tools-only-for-windows-users/">more info</a>). In our case, we definitely need RTools because <code>rgdal</code>, <code>rgeos</code> and <code>gpclib</code> are all wrappers for functions written in C++.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Do I really need RTools?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Do I really need RTools?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It isn’t always obvious whether a package needs to be compiled or not. The simplest way to find out if you need RTools is simply to try to install a package. If it needs to be compiled and you don’t have RTools installed, you’ll be informed!</p>
+</div>
+</div>
+<p>The current version of RTools is 4.5, however looking at the <a href="https://cran.r-project.org/bin/windows/Rtools/history.html">RTools compatibility table</a> we see that R 3.6.3 was is only compatible with <strong>RTools 3.5</strong> and earlier. Hence we should download and install RTools 3.5.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Tips for installing RTools">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Tips for installing RTools
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p>When installing RTools, accept the default location (e.g., C:\Rtools). If you put it somewhere else, things can break.</p></li>
+<li><p>During installation, be sure to select the option to add RTools to the system PATH.</p></li>
+<li><p>After installing, you can verify that RTools is on the path and R can find it by running:</p></li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.which</span>(<span class="st">"make"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4.-launch-the-earlier-version-of-r" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.-launch-the-earlier-version-of-r">Step 4. Launch the earlier version of R</h3>
+<div class="callout callout-style-default callout-tip callout-titled" title="How do I manage different versions of R?">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>How do I manage different versions of R?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There are few problems with having different versions of R on your machine. In fact it’s very normal because every time you ‘update’ R it actually installs a new copy. Every version lives in its own folder and is self-contained, so there are no conflicts between versions. Hence you don’t really have to manage anything except to make sure your IDE is using the latest one installed, and periodically uninstalling versions you no longer use.</p>
+<p>Packages are a different story. When you install an R package it typically get shared with future versions of R, so you don’t have re-install every package each time you make an update. However when there’s a big jump in base R it will create a new folder on your hard drive for packages, and you may have to reinstall all your packages from scratch.</p>
+</div>
+</div>
+<p>If you installed an earlier version of R above, then you should use it from here on out.</p>
+<p>Modern IDEs like RStudio are also happy with multiple versions of R. After you install a new version or R, restart RStudio, then go to Tools &gt; Global Options &gt; General &gt; R version. If the latest version isn’t automatically detected, you can select it from the drop down list.</p>
+<p><img src="./images/rstudio-choose-r-installation_460x413.png" class="img-fluid" style="margin:0 auto; display:block;"></p>
+<p>Alternately, you can skip an IDE completely and use the RGui that comes with base R. (Then you will really feel like you’ve gone back in time!)</p>
+</section>
+<section id="step-5.-identify-tlocohs-dependencies" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.-identify-tlocohs-dependencies">Step 5. Identify <code>tlocoh's</code> dependencies</h3>
+<p>Normally when you install a package, any needed dependencies get installed automatically. In our case however, we have to install <code>tlocoh's</code> dependencies manually because we’ll be using older copies. When using a manual process, you always want to install dependencies <em>before</em> you install the package.</p>
+<p>The easiest way to identify a package’s dependencies is by looking at the ‘Imports’ and ‘Suggests’ sections of the DESCRIPTION file. <code>tlocoh's</code> DESCRIPTION file can be found <a href="https://github.com/r-forge/tlocoh/blob/master/pkg/DESCRIPTION">here</a>.</p>
+<p>For this example, we will install all of the dependencies in the Imports and Suggests section:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>req_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sp"</span>, <span class="st">"FNN"</span>, <span class="st">"pbapply"</span>, <span class="st">"rgeos"</span>, <span class="st">"rgdal"</span>, <span class="st">"move"</span>, <span class="st">"png"</span>, <span class="st">"raster"</span>, <span class="st">"XML"</span>, <span class="st">"gpclib"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-6.-install-tlocohs-dependencies-with-groundhog" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.-install-tlocohs-dependencies-with-groundhog">Step 6. Install <code>tlocoh's</code> dependencies with <code>groundhog</code></h3>
+<p>Now that we have R 3.6.3 installed, as well as RTools 3.5, we’re ready to install <code>tlocoh.</code> We’ll start with the dependencies and then <code>tlocoh</code> itself.</p>
+<p>The <code>groundhog</code> package is designed specifically to manage older versions of packages. First make sure you’re working in R 3.6.3. Run the following to get started:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## install.packages("groundhog")</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"groundhog"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>back_date <span class="ot">&lt;-</span> <span class="st">"2020-01-01"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>req_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sp"</span>, <span class="st">"FNN"</span>, <span class="st">"pbapply"</span>, <span class="st">"rgeos"</span>, <span class="st">"rgdal"</span>, <span class="st">"move"</span>, <span class="st">"png"</span>, <span class="st">"raster"</span>, <span class="st">"XML"</span>, <span class="st">"gpclib"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The function to install old packages is <code>ground.library()</code>, which can be run in a loop:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (old_pkg <span class="cf">in</span> req_pkgs) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Installing old version of "</span>, old_pkg, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groundhog.library</span>(old_pkg, back_date)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-7.-install-tlocoh" class="level3">
+<h3 class="anchored" data-anchor-id="step-7.-install-tlocoh">Step 7. Install <code>tlocoh</code></h3>
+<p>With all the dependencies installed, installing <code>tlocoh</code> should be a breeze. <code>tlocoh</code> was never archived on CRAN (in fact it has never been on CRAN), so we don’t need to use <code>groundhog</code>. We can simply use the recommended command from the <a href="https://tlocoh.r-forge.r-project.org/">website</a>. <strong>Note the use of <code>dependencies = FALSE</code></strong> to tell R that we don’t want it to install any dependent packages (because we already took care of that).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tlocoh"</span>, <span class="at">dependencies =</span> <span class="cn">FALSE</span>, <span class="at">repos =</span> <span class="st">"http://R-Forge.R-project.org"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="step-8.-run-a-test-script" class="level3">
+<h3 class="anchored" data-anchor-id="step-8.-run-a-test-script">Step 8. Run a test script</h3>
+<p>To check if <code>tlocoh</code> is fully working, you can work thru <a href="tlocoh-tutorial-code.R">this script</a> which follows the <a href="https://tlocoh.r-forge.r-project.org/tlocoh_tutorial_2014-08-17.pdf">tutorial Vignette</a>. Remember though that you must be working in R 3.6.3, because that’s the version that has <code>tlocoh</code> installed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tlocoh)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Inspect toni sample data</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(toni)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Project coordinates to UTM</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(sp)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(rgdal)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>toni.sp.latlong <span class="ot">&lt;-</span> <span class="fu">SpatialPoints</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=longlat +ellps=WGS84"</span>))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>toni.sp.utm <span class="ot">&lt;-</span> <span class="fu">spTransform</span>(toni.sp.latlong, <span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>toni.mat.utm <span class="ot">&lt;-</span> <span class="fu">coordinates</span>(toni.sp.utm)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(toni.mat.utm) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x"</span>,<span class="st">"y"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Create timestamps</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni<span class="sc">$</span>timestamp.utc)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.character</span>(toni<span class="sc">$</span>timestamp.utc))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>toni.gmt <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(toni<span class="sc">$</span>timestamp.utc, <span class="at">tz=</span><span class="st">"UTC"</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>toni.gmt[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>local.tz <span class="ot">&lt;-</span> <span class="st">"Africa/Johannesburg"</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>toni.localtime <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">format</span>(toni.gmt, <span class="at">tz=</span>local.tz), <span class="at">tz=</span>local.tz)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>toni.localtime[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Create locoh-xy object</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>toni.lxy <span class="ot">&lt;-</span> <span class="fu">xyt.lxy</span>(<span class="at">xy=</span>toni.mat.utm, <span class="at">dt=</span>toni.localtime, <span class="at">id=</span><span class="st">"toni"</span>, <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(toni.lxy)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni.lxy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><img src="./images/tlocoh_toni_600x554x256.png" class="img-fluid" style="margin:0 auto; display:block;"></p>
+</section>
+</section>
+<section id="analyzing-tlocohs-outputs-in-the-current-version-of-r" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-tlocohs-outputs-in-the-current-version-of-r">Analyzing <code>tlocoh's</code> Outputs in the Current Version of R</h2>
+<p>Creating an R time machine circa 2020 allows you to run <code>tlocoh</code> code, but what if you want to work with the outputs in the latest version of R, using the latest greatest packages?</p>
+<p>Because you can’t run <code>tlocoh</code> in the latest version of R, your best option is to export outputs to disk, switch to the current release of R, and import them.</p>
+<p>You can save <code>tlocoh's</code> outputs to disk in standard formats compatible with any version of R. For <code>tlocoh's</code> spatial outputs, this could include standard GIS formats like Shapefiles, which you can create using functions from <code>tlocoh</code> or <code>rgdal</code>. Alternatively you can export them as native R objects (e.g., rds files), and then import them as data frames and <code>sp</code> objects. This will take a little digging into <code>tlocoh's</code> data formats (but see the Vignette on <a href="https://github.com/r-forge/tlocoh/blob/master/pkg/inst/doc/tlocoh_data_classes.pdf">T-LoCoH Data Classes</a>).</p>
+</section>
+
+</main>
+<!-- /main column -->
+<hr>
+
+<p style="font-size:90%; font-style:italic; text-align:center;">This work was supported by the USDA - National Institute of Food and Agriculture (Hatch Project 7003843; Hales).</p>
+
+
+
+<p style="margin-top:2em;">
+
+<a href="https://ucanr.edu/program/informatics-and-gis-program">
+
+<img src="./images/igis-logo_500x150.png" style="width:300px; height:90px;">
+
+</a>
+
+</p>
+
+
+
+<p>&nbsp;</p>
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
