@@ -224,7 +224,7 @@ img.screenshot, div.json-chunk {
 <section id="summary" class="level2">
 <h2 class="anchored" data-anchor-id="summary">Summary</h2>
 <p><a href="https://cran.r-project.org/package=rgdal"><code>rgdal</code></a> and <a href="https://cran.r-project.org/package=rgeos"><code>rgeos</code></a> were the backbone of spatial data operations in R for over a decade. Unfortunately they eventually became out of date as their primary maintainer approached retirement, and were eventually replaced by the more modern <a href="https://r-spatial.github.io/sf/"><code>sf</code></a> package. In 2023 they were archived on CRAN and could no longer be installed through the normal channels.</p>
-<p>Many packages that used <code>rgdal</code> and <code>rgeos</code> were updated to the <code>sf</code> package, but not all (e.g., <a href="https://tlocoh.r-forge.r-project.org/"><code>tlocoh</code></a>). This creates a challenge for current users because you can’t install a package if the required dependencies are not available. This Tech Note describes a work-around to install older packages that are still dependent on <code>rgdal</code> and <code>rgeos</code>.</p>
+<p>Many packages that used <code>rgdal</code> and <code>rgeos</code> were updated to the <code>sf</code> package, but not all (e.g., <a href="https://tlocoh.r-forge.r-project.org/"><code>tlocoh</code></a>). This creates a challenge for current users because you can’t install a package if the required dependencies are not available. This Tech Note describes a work-around to install older packages that are still dependent on <code>rgdal</code> and <code>rgeos</code>, by essentially installing a legacy version of R with legacy version of the packages.</p>
 </section>
 <section id="background" class="level2">
 <h2 class="anchored" data-anchor-id="background">Background</h2>
@@ -291,7 +291,7 @@ img.screenshot, div.json-chunk {
 <p>To determine whether your package or any of its dependencies are incompatible with the current release of R, you can ask a search engine or GenAI tool which will point you to documentation and announcements.</p>
 </div>
 </div>
-<p>To make sure we have a compatible version of R, we’ll install a release that was active when everything was working. Looking at CRAN’s list of <a href="https://cran.r-project.org/bin/windows/base/old/">Previous Releases of R</a>, we see that that R 3.6.3 was published in February 2020. So we’ll go with that. You can download older versions of R from <a href="https://cran.r-project.org/bin/windows/base/old/" class="uri">https://cran.r-project.org/bin/windows/base/old/</a>.</p>
+<p>To make sure we have a compatible version of R, we’ll install a release that was active when everything was working. Looking at CRAN’s list of <a href="https://cran.r-project.org/bin/windows/base/old/">Previous Releases of R</a>, we see that <strong>R 3.6.3</strong> was published in February 2020. So we’ll go with that. You can download older versions of R from <a href="https://cran.r-project.org/bin/windows/base/old/" class="uri">https://cran.r-project.org/bin/windows/base/old/</a>.</p>
 </section>
 <section id="step-3.-install-rtools" class="level3">
 <h3 class="anchored" data-anchor-id="step-3.-install-rtools">Step 3. Install RTools</h3>
@@ -309,7 +309,7 @@ img.screenshot, div.json-chunk {
 <p>It isn’t always obvious whether a package needs to be compiled or not. The simplest way to find out if you need RTools is simply to try to install a package. If it needs to be compiled and you don’t have RTools installed, you’ll be informed!</p>
 </div>
 </div>
-<p>The current version of RTools is 4.5, however looking at the <a href="https://cran.r-project.org/bin/windows/Rtools/history.html">RTools compatibility table</a> we see that R 3.6.3 was is only compatible with <strong>RTools 3.5</strong> and earlier. Hence we should download and install RTools 3.5.</p>
+<p>The current version of RTools is 4.5, however looking at the <a href="https://cran.r-project.org/bin/windows/Rtools/history.html">RTools compatibility table</a> we see that R 3.6.3 is only compatible with <strong>RTools 3.5</strong> and earlier. Hence we should download and install RTools 3.5.</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Tips for installing RTools">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -321,7 +321,7 @@ img.screenshot, div.json-chunk {
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li><p>When installing RTools, accept the default location (e.g., C:\Rtools). If you put it somewhere else, things can break.</p></li>
+<li><p>When installing RTools, accept the default location (e.g., C:\Rtools on Windows). If you put it somewhere else, things can break.</p></li>
 <li><p>During installation, be sure to select the option to add RTools to the system PATH.</p></li>
 <li><p>After installing, you can verify that RTools is on the path and R can find it by running:</p></li>
 </ol>
@@ -364,64 +364,82 @@ img.screenshot, div.json-chunk {
 <section id="step-6.-install-tlocohs-dependencies-with-groundhog" class="level3">
 <h3 class="anchored" data-anchor-id="step-6.-install-tlocohs-dependencies-with-groundhog">Step 6. Install <code>tlocoh's</code> dependencies with <code>groundhog</code></h3>
 <p>Now that we have R 3.6.3 installed, as well as RTools 3.5, we’re ready to install <code>tlocoh.</code> We’ll start with the dependencies and then <code>tlocoh</code> itself.</p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Alternative: Posit Package Manager">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Alternative: Posit Package Manager
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An alternative to the <code>groundhog</code> package is to use historical snapshots of CRAN from the Posit Package Manager. By setting the repository URL to a specific date, R treats CRAN exactly as it was on that day.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repos =</span> <span class="fu">c</span>(<span class="at">CRAN =</span> <span class="st">"https://packagemanager.posit.co/cran/2020-01-01"</span>))<span class="er">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>After you’ve ‘redirected’ the CRAN repo URL to a date-stamped version of the Posit Package Manager, you can install packages as usual with <code>install.packages()</code>, and it will be like you are back in January 2020.</p>
+<p>A bonus of using the Posit Package Manager (assuming it works) is that it provides pre-compiled binaries on some operating systems. This might allow you to skip installing RTools.</p>
+</div>
+</div>
 <p>The <code>groundhog</code> package is designed specifically to manage older versions of packages. First make sure you’re working in R 3.6.3. Run the following to get started:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## install.packages("groundhog")</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"groundhog"</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>back_date <span class="ot">&lt;-</span> <span class="st">"2020-01-01"</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>req_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sp"</span>, <span class="st">"FNN"</span>, <span class="st">"pbapply"</span>, <span class="st">"rgeos"</span>, <span class="st">"rgdal"</span>, <span class="st">"move"</span>, <span class="st">"png"</span>, <span class="st">"raster"</span>, <span class="st">"XML"</span>, <span class="st">"gpclib"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## install.packages("groundhog")</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"groundhog"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>back_date <span class="ot">&lt;-</span> <span class="st">"2020-01-01"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>req_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"sp"</span>, <span class="st">"FNN"</span>, <span class="st">"pbapply"</span>, <span class="st">"rgeos"</span>, <span class="st">"rgdal"</span>, <span class="st">"move"</span>, <span class="st">"png"</span>, <span class="st">"raster"</span>, <span class="st">"XML"</span>, <span class="st">"gpclib"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The function to install old packages is <code>ground.library()</code>, which can be run in a loop:</p>
+<p>The function to install old packages is <code>groundhog.library()</code>, which can be run in a loop:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (old_pkg <span class="cf">in</span> req_pkgs) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Installing old version of "</span>, old_pkg, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groundhog.library</span>(old_pkg, back_date)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (old_pkg <span class="cf">in</span> req_pkgs) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Installing old version of "</span>, old_pkg, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groundhog.library</span>(old_pkg, back_date)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="step-7.-install-tlocoh" class="level3">
 <h3 class="anchored" data-anchor-id="step-7.-install-tlocoh">Step 7. Install <code>tlocoh</code></h3>
 <p>With all the dependencies installed, installing <code>tlocoh</code> should be a breeze. <code>tlocoh</code> was never archived on CRAN (in fact it has never been on CRAN), so we don’t need to use <code>groundhog</code>. We can simply use the recommended command from the <a href="https://tlocoh.r-forge.r-project.org/">website</a>. <strong>Note the use of <code>dependencies = FALSE</code></strong> to tell R that we don’t want it to install any dependent packages (because we already took care of that).</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tlocoh"</span>, <span class="at">dependencies =</span> <span class="cn">FALSE</span>, <span class="at">repos =</span> <span class="st">"http://R-Forge.R-project.org"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tlocoh"</span>, <span class="at">dependencies =</span> <span class="cn">FALSE</span>, <span class="at">repos =</span> <span class="st">"http://R-Forge.R-project.org"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="step-8.-run-a-test-script" class="level3">
 <h3 class="anchored" data-anchor-id="step-8.-run-a-test-script">Step 8. Run a test script</h3>
-<p>To check if <code>tlocoh</code> is fully working, you can work thru <a href="tlocoh-tutorial-code.R">this script</a> which follows the <a href="https://tlocoh.r-forge.r-project.org/tlocoh_tutorial_2014-08-17.pdf">tutorial Vignette</a>. Remember though that you must be working in R 3.6.3, because that’s the version that has <code>tlocoh</code> installed.</p>
+<p>To check if <code>tlocoh</code> is fully working, you can work thru <a href="https://github.com/UCANR-IGIS/tech_notes/blob/main/docs/tlocoh-tutorial-code.R">this script</a> which follows the <a href="https://tlocoh.r-forge.r-project.org/tlocoh_tutorial_2014-08-17.pdf">tutorial Vignette</a>. Remember though that you must be working in R 3.6.3, because that’s the version that has <code>tlocoh</code> installed.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tlocoh)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Inspect toni sample data</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(toni)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">pch=</span><span class="dv">20</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Project coordinates to UTM</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(sp)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(rgdal)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>toni.sp.latlong <span class="ot">&lt;-</span> <span class="fu">SpatialPoints</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=longlat +ellps=WGS84"</span>))</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>toni.sp.utm <span class="ot">&lt;-</span> <span class="fu">spTransform</span>(toni.sp.latlong, <span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>toni.mat.utm <span class="ot">&lt;-</span> <span class="fu">coordinates</span>(toni.sp.utm)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(toni.mat.utm) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x"</span>,<span class="st">"y"</span>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Create timestamps</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni<span class="sc">$</span>timestamp.utc)</span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.character</span>(toni<span class="sc">$</span>timestamp.utc))</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>toni.gmt <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(toni<span class="sc">$</span>timestamp.utc, <span class="at">tz=</span><span class="st">"UTC"</span>)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>toni.gmt[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>local.tz <span class="ot">&lt;-</span> <span class="st">"Africa/Johannesburg"</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>toni.localtime <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">format</span>(toni.gmt, <span class="at">tz=</span>local.tz), <span class="at">tz=</span>local.tz)</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>toni.localtime[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Create locoh-xy object</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>toni.lxy <span class="ot">&lt;-</span> <span class="fu">xyt.lxy</span>(<span class="at">xy=</span>toni.mat.utm, <span class="at">dt=</span>toni.localtime, <span class="at">id=</span><span class="st">"toni"</span>, <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(toni.lxy)</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni.lxy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tlocoh)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Inspect toni sample data</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(toni)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Project coordinates to UTM</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(sp)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(rgdal)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>toni.sp.latlong <span class="ot">&lt;-</span> <span class="fu">SpatialPoints</span>(toni[ , <span class="fu">c</span>(<span class="st">"long"</span>,<span class="st">"lat"</span>)], <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=longlat +ellps=WGS84"</span>))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>toni.sp.utm <span class="ot">&lt;-</span> <span class="fu">spTransform</span>(toni.sp.latlong, <span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>toni.mat.utm <span class="ot">&lt;-</span> <span class="fu">coordinates</span>(toni.sp.utm)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(toni.mat.utm) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"x"</span>,<span class="st">"y"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(toni.mat.utm)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Create timestamps</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(toni<span class="sc">$</span>timestamp.utc)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.character</span>(toni<span class="sc">$</span>timestamp.utc))</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>toni.gmt <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(toni<span class="sc">$</span>timestamp.utc, <span class="at">tz=</span><span class="st">"UTC"</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>toni.gmt[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>local.tz <span class="ot">&lt;-</span> <span class="st">"Africa/Johannesburg"</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>toni.localtime <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">format</span>(toni.gmt, <span class="at">tz=</span>local.tz), <span class="at">tz=</span>local.tz)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>toni.localtime[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Create locoh-xy object</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>toni.lxy <span class="ot">&lt;-</span> <span class="fu">xyt.lxy</span>(<span class="at">xy=</span>toni.mat.utm, <span class="at">dt=</span>toni.localtime, <span class="at">id=</span><span class="st">"toni"</span>, <span class="at">proj4string=</span><span class="fu">CRS</span>(<span class="st">"+proj=utm +south +zone=36 +ellps=WGS84"</span>))</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(toni.lxy)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(toni.lxy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><img src="./images/tlocoh_toni_600x554x256.png" class="img-fluid" style="margin:0 auto; display:block;"></p>
 </section>
@@ -429,8 +447,8 @@ img.screenshot, div.json-chunk {
 <section id="analyzing-tlocohs-outputs-in-the-current-version-of-r" class="level2">
 <h2 class="anchored" data-anchor-id="analyzing-tlocohs-outputs-in-the-current-version-of-r">Analyzing <code>tlocoh's</code> Outputs in the Current Version of R</h2>
 <p>Creating an R time machine circa 2020 allows you to run <code>tlocoh</code> code, but what if you want to work with the outputs in the latest version of R, using the latest greatest packages?</p>
-<p>Because you can’t run <code>tlocoh</code> in the latest version of R, your best option is to export outputs to disk, switch to the current release of R, and import them.</p>
-<p>You can save <code>tlocoh's</code> outputs to disk in standard formats compatible with any version of R. For <code>tlocoh's</code> spatial outputs, this could include standard GIS formats like Shapefiles, which you can create using functions from <code>tlocoh</code> or <code>rgdal</code>. Alternatively you can export them as native R objects (e.g., rds files), and then import them as data frames and <code>sp</code> objects. This will take a little digging into <code>tlocoh's</code> data formats (but see the Vignette on <a href="https://github.com/r-forge/tlocoh/blob/master/pkg/inst/doc/tlocoh_data_classes.pdf">T-LoCoH Data Classes</a>).</p>
+<p>Because you can’t run <code>tlocoh</code> in the latest version of R, your best option is to export outputs to disk in your time machine, switch to the current release of R, and import them.</p>
+<p>You can save <code>tlocoh's</code> outputs to disk in standard formats compatible with any version of R. For <code>tlocoh's</code> spatial outputs, this could include standard GIS formats like Shapefiles, which you can create using functions from <code>tlocoh</code> or <code>rgdal</code>. Even better, you can export them as native R objects (e.g., rds files created with <code>saveRDS()</code>), and then import them as data frames and <code>sp</code> objects. This will take a little digging into <code>tlocoh's</code> data formats (but see the Vignette on <a href="https://github.com/r-forge/tlocoh/blob/master/pkg/inst/doc/tlocoh_data_classes.pdf">T-LoCoH Data Classes</a>).</p>
 </section>
 
 </main>

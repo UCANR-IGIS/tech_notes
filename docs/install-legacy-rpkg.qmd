@@ -74,7 +74,7 @@ IGIS <a href="http://igis.ucanr.edu/Tech_Notes/">Tech Notes</a> describe workflo
 
 [`rgdal`](https://cran.r-project.org/package=rgdal) and [`rgeos`](https://cran.r-project.org/package=rgeos) were the backbone of spatial data operations in R for over a decade. Unfortunately they eventually became out of date as their primary maintainer approached retirement, and were eventually replaced by the more modern [`sf`](https://r-spatial.github.io/sf/) package. In 2023 they were archived on CRAN and could no longer be installed through the normal channels.
 
-Many packages that used `rgdal` and `rgeos` were updated to the `sf` package, but not all (e.g., [`tlocoh`](https://tlocoh.r-forge.r-project.org/)). This creates a challenge for current users because you can't install a package if the required dependencies are not available. This Tech Note describes a work-around to install older packages that are still dependent on `rgdal` and `rgeos`.
+Many packages that used `rgdal` and `rgeos` were updated to the `sf` package, but not all (e.g., [`tlocoh`](https://tlocoh.r-forge.r-project.org/)). This creates a challenge for current users because you can't install a package if the required dependencies are not available. This Tech Note describes a work-around to install older packages that are still dependent on `rgdal` and `rgeos`, by essentially installing a legacy version of R with legacy version of the packages.
 
 ## Background
 
@@ -124,7 +124,7 @@ That being said, there are definitely some packages that get broken with updates
 To determine whether your package or any of its dependencies are incompatible with the current release of R, you can ask a search engine or GenAI tool which will point you to documentation and announcements.
 :::
 
-To make sure we have a compatible version of R, we'll install a release that was active when everything was working. Looking at CRAN's list of [Previous Releases of R](https://cran.r-project.org/bin/windows/base/old/), we see that that R 3.6.3 was published in February 2020. So we'll go with that. You can download older versions of R from <https://cran.r-project.org/bin/windows/base/old/>. 
+To make sure we have a compatible version of R, we'll install a release that was active when everything was working. Looking at CRAN's list of [Previous Releases of R](https://cran.r-project.org/bin/windows/base/old/), we see that **R 3.6.3** was published in February 2020. So we'll go with that. You can download older versions of R from <https://cran.r-project.org/bin/windows/base/old/>. 
 
 ### Step 3. Install RTools
 
@@ -134,10 +134,10 @@ RTools is a separate set of utilities to install packages that need to be compil
 It isn't always obvious whether a package needs to be compiled or not. The simplest way to find out if you need RTools is simply to try to install a package. If it needs to be compiled and you don't have RTools installed, you'll be informed!
 :::
 
-The current version of RTools is 4.5, however looking at the [RTools compatibility table](https://cran.r-project.org/bin/windows/Rtools/history.html) we see that R 3.6.3 was is only compatible with  **RTools 3.5** and earlier. Hence we should download and install RTools 3.5. 
+The current version of RTools is 4.5, however looking at the [RTools compatibility table](https://cran.r-project.org/bin/windows/Rtools/history.html) we see that R 3.6.3 is only compatible with  **RTools 3.5** and earlier. Hence we should download and install RTools 3.5. 
 
 ::: {.callout-tip title="Tips for installing RTools"}
-1. When installing RTools, accept the default location (e.g., C:\\Rtools). If you put it somewhere else, things can break.
+1. When installing RTools, accept the default location (e.g., C:\\Rtools on Windows). If you put it somewhere else, things can break.
 
 2. During installation, be sure to select the option to add RTools to the system PATH. 
 
@@ -148,7 +148,6 @@ Sys.which("make")
 ```
 
 :::
-
 
 ### Step 4. Launch the earlier version of R
 
@@ -179,10 +178,22 @@ For this example, we will install all of the dependencies in the Imports and Sug
 req_pkgs <- c("sp", "FNN", "pbapply", "rgeos", "rgdal", "move", "png", "raster", "XML", "gpclib")
 ```
 
-
 ### Step 6. Install `tlocoh's` dependencies with `groundhog`
 
 Now that we have R 3.6.3 installed, as well as RTools 3.5, we're ready to install `tlocoh.` We'll start with the dependencies and then `tlocoh` itself.
+
+::: {.callout-tip title="Alternative: Posit Package Manager"}
+
+An alternative to the `groundhog` package is to use historical snapshots of CRAN from the Posit Package Manager. By setting the repository URL to a specific date, R treats CRAN exactly as it was on that day. 
+
+```{r eval = FALSE}
+options(repos = c(CRAN = "https://packagemanager.posit.co/cran/2020-01-01")))
+```
+
+After you've 'redirected' the CRAN repo URL to a date-stamped version of the Posit Package Manager, you can install packages as usual with `install.packages()`, and it will be like you are back in January 2020. 
+
+A bonus of using the Posit Package Manager (assuming it works) is that it provides pre-compiled binaries on some operating systems. This might allow you to skip installing RTools.
+:::
 
 The `groundhog` package is designed specifically to manage older versions of packages. First make sure you're working in R 3.6.3. Run the following to get started:
 
@@ -194,7 +205,7 @@ back_date <- "2020-01-01"
 req_pkgs <- c("sp", "FNN", "pbapply", "rgeos", "rgdal", "move", "png", "raster", "XML", "gpclib")
 ```
 
-The function to install old packages is `ground.library()`, which can be run in a loop:
+The function to install old packages is `groundhog.library()`, which can be run in a loop:
 
 ```{r eval = FALSE}
 for (old_pkg in req_pkgs) {
@@ -213,7 +224,7 @@ install.packages("tlocoh", dependencies = FALSE, repos = "http://R-Forge.R-proje
 
 ### Step 8. Run a test script
 
-To check if `tlocoh` is fully working, you can work thru [this script](tlocoh-tutorial-code.R) which follows the  [tutorial  Vignette](https://tlocoh.r-forge.r-project.org/tlocoh_tutorial_2014-08-17.pdf). Remember though that you must be working in R 3.6.3, because that's the version that has `tlocoh` installed.
+To check if `tlocoh` is fully working, you can work thru [this script](https://github.com/UCANR-IGIS/tech_notes/blob/main/docs/tlocoh-tutorial-code.R) which follows the  [tutorial  Vignette](https://tlocoh.r-forge.r-project.org/tlocoh_tutorial_2014-08-17.pdf). Remember though that you must be working in R 3.6.3, because that's the version that has `tlocoh` installed.
 
 ```{r eval = FALSE}
 library(tlocoh)
@@ -255,7 +266,7 @@ plot(toni.lxy)
 
 Creating an R time machine circa 2020 allows you to run `tlocoh` code, but what if you want to work with the outputs in the latest version of R, using the latest greatest packages?
 
-Because you can't run `tlocoh` in the latest version of R, your best option is to export outputs to disk, switch to the current release of R, and import them.
+Because you can't run `tlocoh` in the latest version of R, your best option is to export outputs to disk in your time machine, switch to the current release of R, and import them.
 
-You can save `tlocoh's` outputs to disk in standard formats compatible with any version of R. For `tlocoh's` spatial outputs, this could include standard GIS formats like Shapefiles, which you can create using functions from `tlocoh` or `rgdal`. Alternatively you can export them as native R objects (e.g., rds files), and then import them as data frames and `sp` objects. This will take a little digging into `tlocoh's` data formats (but see the Vignette on [T-LoCoH Data Classes](https://github.com/r-forge/tlocoh/blob/master/pkg/inst/doc/tlocoh_data_classes.pdf)).
+You can save `tlocoh's` outputs to disk in standard formats compatible with any version of R. For `tlocoh's` spatial outputs, this could include standard GIS formats like Shapefiles, which you can create using functions from `tlocoh` or `rgdal`. Even better, you can export them as native R objects (e.g., rds files created with `saveRDS()`), and then import them as data frames and `sp` objects. This will take a little digging into `tlocoh's` data formats (but see the Vignette on [T-LoCoH Data Classes](https://github.com/r-forge/tlocoh/blob/master/pkg/inst/doc/tlocoh_data_classes.pdf)).
 
